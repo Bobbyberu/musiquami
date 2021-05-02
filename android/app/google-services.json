@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "446369320638",
+    "firebase_url": "https://musiquami-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "musiquami",
+    "storage_bucket": "musiquami.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:446369320638:android:580d60a5c7ee6ce84698ef",
+        "android_client_info": {
+          "package_name": "com.bobbybel.musiquami"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "446369320638-trh1q9i5j2m3gi3kik1o514d5rdlobj7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBDAfZEHODdXvwqcyb4j6jU5cDjTTdWvy0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "446369320638-trh1q9i5j2m3gi3kik1o514d5rdlobj7.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

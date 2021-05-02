@@ -1,0 +1,36 @@
+name: musiquamiapp
+description: Musiquami app.
+
+publish_to: "none" # Remove this line if you wish to publish to pub.dev
+
+version: 1.0.0+1
+
+environment:
+  sdk: ">=2.7.0 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  webview_flutter: ^2.0.4
+  firebase_core: ^1.0.3
+  firebase_database: ^6.1.2
+  page_transition: ^1.1.7+6
+
+  cupertino_icons: ^1.0.2
+  flutter_multi_formatter: ^2.0.2
+  json_annotation: ^4.0.1
+  dio: ^3.0.10
+  flutter_typeahead: ^3.1.1
+  easy_debounce: ^2.0.0
+  another_flushbar: ^1.10.20
+  connectivity: ^3.0.3
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - secrets.json
