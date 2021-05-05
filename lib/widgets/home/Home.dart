@@ -90,7 +90,9 @@ class _HomeState extends State<Home> {
                                                 color:
                                                     CustomColors.sakuraCream),
                                           ),
-                                          style: _builButtonStyle())),
+                                          style: Theme.of(context)
+                                              .elevatedButtonTheme
+                                              .style)),
                                   Padding(
                                       padding: EdgeInsets.fromLTRB(0, 20, 0, 0),
                                       child: ElevatedButton(
@@ -107,18 +109,10 @@ class _HomeState extends State<Home> {
                                                 color:
                                                     CustomColors.sakuraCream),
                                           ),
-                                          style: _builButtonStyle()))
+                                          style: Theme.of(context)
+                                              .elevatedButtonTheme
+                                              .style))
                                 ]))
                       ])));
-  }
-
-  ButtonStyle _builButtonStyle() {
-    return ButtonStyle(
-        shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(40.0))),
-        padding: MaterialStateProperty.all(EdgeInsets.all(20)),
-        // take width of parent container
-        minimumSize: MaterialStateProperty.all(Size(double.infinity, 0)),
-        overlayColor: MaterialStateProperty.all(CustomColors.sakuraLighter));
   }
 }

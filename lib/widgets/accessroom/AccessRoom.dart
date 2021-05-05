@@ -92,17 +92,7 @@ class _AccessRoomState extends State<AccessRoom> {
                               style: buttonDisabled
                                   ? TextStyle(color: CustomColors.sakuraDarker)
                                   : Theme.of(context).textTheme.button),
-                          style: ButtonStyle(
-                              shape: MaterialStateProperty.all<
-                                      RoundedRectangleBorder>(
-                                  RoundedRectangleBorder(
-                                      borderRadius:
-                                          BorderRadius.circular(40.0))),
-                              padding:
-                                  MaterialStateProperty.all(EdgeInsets.all(20)),
-                              // take width of parent container
-                              minimumSize: MaterialStateProperty.all(
-                                  Size(double.infinity, 0)))),
+                          style: Theme.of(context).elevatedButtonTheme.style),
                     )
                   ]))
             ])));

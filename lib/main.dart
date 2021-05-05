@@ -36,6 +36,18 @@ class MusiquamiApp extends StatelessWidget {
                   fontSize: 20,
                   fontWeight: FontWeight.bold)),
           buttonTheme: ButtonThemeData(buttonColor: CustomColors.sakuraLight),
+          elevatedButtonTheme: ElevatedButtonThemeData(
+            style: ButtonStyle(
+                shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                    RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(40.0))),
+                padding: MaterialStateProperty.all(EdgeInsets.all(20)),
+                // take width of parent container
+                minimumSize:
+                    MaterialStateProperty.all(Size(double.infinity, 0)),
+                overlayColor:
+                    MaterialStateProperty.all(CustomColors.sakuraLighter)),
+          ),
           scaffoldBackgroundColor: CustomColors.sakuraDark),
     );
   }
