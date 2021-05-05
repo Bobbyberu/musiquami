@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ui';
 
 import 'package:another_flushbar/flushbar.dart';
 import 'package:easy_debounce/easy_debounce.dart';
@@ -41,6 +42,8 @@ class _RoomState extends State<Room> {
     super.initState();
     initRoom();
     initCredentialsChangedListener();
+    _searchController
+        .addListener(() async => await _getTracks(_searchController.text));
   }
 
   void initRoom() async {
@@ -71,25 +74,72 @@ class _RoomState extends State<Room> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        body: Center(
-      child: Wrap(
-        children: <Widget>[
-          TextField(
-            onChanged: (value) async => await _getTracks(value),
-            decoration: InputDecoration(
-              border: OutlineInputBorder(),
-            ),
-            controller: _searchController,
-          ),
-          if (tracks.length != 0 && showTracks)
-            SizedBox(
-              height: 200,
-              child: _buildTrackListView(),
-            ),
-        ],
-      ),
-    ));
+    return Theme(
+        data: Theme.of(context),
+        child: Scaffold(
+            resizeToAvoidBottomInset: false,
+            body: SafeArea(
+              child: Stack(
+                //mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  if (tracks.length != 0 && showTracks)
+                    _buildTrackListView()
+                  else
+                    Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Padding(
+                              padding: EdgeInsets.fromLTRB(30, 0, 30, 50),
+                              child: Wrap(children: [
+                                Padding(
+                                    padding: EdgeInsets.fromLTRB(0, 0, 0, 40),
+                                    child: Text('Bienvenue 👋',
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .headline1
+                                            .copyWith(fontSize: 30))),
+                                Text(
+                                    'Tu peux inviter d\'autres personnes en leur donnant ce code :',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .headline1
+                                        .copyWith(fontSize: 25))
+                              ])),
+                          Text(code,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .headline1
+                                  .copyWith(fontSize: 45))
+                        ]),
+                  Stack(children: [
+                    // searchbar background is blurred
+                    ClipRect(
+                        child: BackdropFilter(
+                            filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+                            child: Container(
+                                height: 80,
+                                decoration: BoxDecoration(
+                                    color: CustomColors.sakuraDark.shade100)))),
+                    Padding(
+                        padding: EdgeInsets.all(10),
+                        child: TextField(
+                          style: Theme.of(context).textTheme.headline2,
+                          decoration: InputDecoration(
+                              fillColor: CustomColors.sakuraLight.shade100,
+                              prefixIcon: Icon(Icons.search),
+                              suffixIcon: _searchController.text != ''
+                                  ? IconButton(
+                                      icon: Icon(Icons.close),
+                                      onPressed: () =>
+                                          _searchController.clear(),
+                                    )
+                                  : null),
+                          controller: _searchController,
+                        )),
+                  ]),
+                ],
+              ),
+            )));
   }
 
   @override
@@ -104,15 +154,15 @@ class _RoomState extends State<Room> {
       // ignore: return_of_invalid_type_from_catch_error
       spotify
           .queue(track.uri)
-          .then((value) => _displayErrorSnackbar(
-              'Le titre a été ajouté à la file d\'attente!', false))
+          .then((value) => _displaySnackbar(
+              'Le titre a été ajouté à la file d\'attente !', false))
           .catchError((error) {
         // room owner has no music playing on any of his spotify devices
         if (error.response.statusCode == 404 &&
             error.response.data['error']['reason'] == 'NO_ACTIVE_DEVICE') {
-          _displayErrorSnackbar(error404Queue, true);
+          _displaySnackbar(error404Queue, true);
         } else {
-          _displayErrorSnackbar('Erreur', true);
+          _displaySnackbar('Erreur', true);
         }
       });
       setState(() {
@@ -132,7 +182,7 @@ class _RoomState extends State<Room> {
 
   Widget _buildTrackListView() {
     return ListView.separated(
-      padding: const EdgeInsets.all(8),
+      padding: EdgeInsets.fromLTRB(10, 100, 10, 10),
       itemBuilder: (context, i) => _buildTrackRow(i),
       separatorBuilder: (BuildContext context, int index) => const Divider(),
       itemCount: tracks.length,
@@ -145,8 +195,38 @@ class _RoomState extends State<Room> {
     final track = tracks[i];
 
     return GestureDetector(
+      // make all gesture detector tappable, not just text and image
+      behavior: HitTestBehavior.translucent,
       key: Key(track.uri),
-      child: Text('${track.artists} - ${track.name}'),
+      child: Container(
+        child: Row(
+          children: [
+            Image.network(track.imageUrl),
+            Expanded(
+                child: Padding(
+                    padding: EdgeInsets.fromLTRB(10, 0, 0, 0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Text(
+                          '${track.name}',
+                          overflow: TextOverflow.ellipsis,
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyText1
+                              .copyWith(fontWeight: FontWeight.bold),
+                        ),
+                        Text(
+                          '${track.artists}',
+                          overflow: TextOverflow.ellipsis,
+                          style: Theme.of(context).textTheme.bodyText1,
+                        ),
+                      ],
+                    )))
+          ],
+        ),
+      ),
       onTap: () {
         FocusScope.of(context).unfocus();
         _showConfirmationDialog(track);
@@ -154,24 +234,22 @@ class _RoomState extends State<Room> {
     );
   }
 
-  void _displayErrorSnackbar(String message, bool isError) {
+  void _displaySnackbar(String message, bool isError) {
     Flushbar(
         message: message,
+        messageColor: CustomColors.sakuraCream,
         duration: Duration(seconds: 7),
-        flushbarPosition: FlushbarPosition.TOP,
+        flushbarPosition:
+            isError ? FlushbarPosition.TOP : FlushbarPosition.BOTTOM,
         margin: EdgeInsets.all(8),
         borderRadius: BorderRadius.circular(8),
         icon: Icon(
           isError ? Icons.error : Icons.check_circle,
           size: 28.0,
-          color: Colors.white,
+          color: CustomColors.sakuraLighter,
         ),
-        backgroundGradient: LinearGradient(colors: [
-          CustomColors.sakuraDark,
-          CustomColors.sakuraLight,
-          CustomColors.sakuraLighter
-        ]),
-        leftBarIndicatorColor: Colors.white,
+        backgroundColor: CustomColors.darkGrey,
+        leftBarIndicatorColor: CustomColors.sakuraLighter,
         forwardAnimationCurve: Curves.decelerate,
         reverseAnimationCurve: Curves.decelerate)
       ..show(context);
@@ -198,9 +276,9 @@ class _RoomState extends State<Room> {
           });
         }).catchError((error) {
           if (error.response != null && error.response.statusCode == 401) {
-            _displayErrorSnackbar(error401, true);
+            _displaySnackbar(error401, true);
           } else {
-            _displayErrorSnackbar('Erreur', true);
+            _displaySnackbar('Erreur', true);
           }
         });
       } else {

@@ -57,16 +57,12 @@ class _AccessRoomState extends State<AccessRoom> {
                     Padding(
                         padding: EdgeInsets.fromLTRB(20, 0, 20, 30),
                         child: TextFormField(
-                          style: TextStyle(
-                              fontSize: 40, color: CustomColors.sakuraCream),
+                          style: Theme.of(context)
+                              .textTheme
+                              .headline2
+                              .copyWith(fontSize: 40),
                           controller: _controller,
-                          decoration: InputDecoration(
-                              filled: true,
-                              fillColor: CustomColors.sakuraDarker,
-                              focusColor: CustomColors.sakuraCream,
-                              border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(40.0)),
-                              hintText: 'AAAA'),
+                          decoration: InputDecoration(hintText: 'CODE'),
                           textAlign: TextAlign.center,
                           onChanged: (value) => _valueChanged(),
                           onFieldSubmitted: (value) => _submit(value),

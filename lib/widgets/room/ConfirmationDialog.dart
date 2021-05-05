@@ -10,15 +10,28 @@ class ConfirmationDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text('T\'es sûr ?'),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      title: Text(
+        'T\'es sûr ?',
+        style: Theme.of(context)
+            .textTheme
+            .bodyText1
+            .copyWith(fontWeight: FontWeight.bold),
+      ),
       content: SingleChildScrollView(
-        child: ListBody(
-          children: <Widget>[
-            Text(
-                'Tu vas mettre ${track.name} de ${track.artists} dans la file d\'attente.'),
-            Text('C\'est parti tu nous mets bien ?'),
-          ],
-        ),
+        child: RichText(
+            text: TextSpan(
+                style: Theme.of(context).textTheme.bodyText1,
+                children: [
+              TextSpan(text: 'Tu vas mettre '),
+              TextSpan(
+                  text: track.name,
+                  style: TextStyle(fontWeight: FontWeight.bold)),
+              TextSpan(
+                  text:
+                      ' de ${_getFirstArtist(track.artists)} dans la file d\'attente.'),
+              TextSpan(text: 'C\'est parti tu nous mets bien ?')
+            ])),
       ),
       actions: <Widget>[
         TextButton(
@@ -30,5 +43,9 @@ class ConfirmationDialog extends StatelessWidget {
         TextButton(child: Text('Allez!'), onPressed: onConfirm),
       ],
     );
+  }
+
+  String _getFirstArtist(String artists) {
+    return artists.split(',')[0];
   }
 }
