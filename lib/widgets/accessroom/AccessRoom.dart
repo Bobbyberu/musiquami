@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_multi_formatter/flutter_multi_formatter.dart';
 import 'package:musiquamiapp/services/FirebaseService.dart';
+import 'package:musiquamiapp/utils/CustomColors.dart';
 import 'package:musiquamiapp/widgets/accessroom/RoomNotFoundDialog.dart';
 import 'package:musiquamiapp/widgets/room/Room.dart';
 import 'package:musiquamiapp/utils/UpperCaseTextFormatter.dart';
@@ -22,44 +23,89 @@ class _AccessRoomState extends State<AccessRoom> {
     });
   }
 
+// TODO ajouter loaders pour retour utilisateur?
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(leading: Builder(builder: (BuildContext context) {
-          return IconButton(
-            icon: Icon(Icons.arrow_back_ios),
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-          );
-        })),
-        body: Center(
-            child: Wrap(children: <Widget>[
-          TextFormField(
-            controller: _controller,
-            decoration:
-                InputDecoration(border: OutlineInputBorder(), hintText: 'ABCD'),
-            textAlign: TextAlign.center,
-            onChanged: (value) => _valueChanged(),
-            onFieldSubmitted: (value) => _submit(value),
-            inputFormatters: [
-              MaskedInputFormatter('####', anyCharMatcher: RegExp(r'[a-zA-Z]')),
-              UpperCaseTextFormatter()
-            ],
-            keyboardType: TextInputType.name,
-          ),
-          ElevatedButton(
-            // disable button if value has no input
-            onPressed: buttonDisabled
-                ? null
-                : () {
-                    // hide keyboard after pressing button
-                    FocusScope.of(context).unfocus();
-                    _submit(_controller.text);
+    return Theme(
+        data: Theme.of(context),
+        child: Scaffold(
+            // keyboard should not move widget when displayed
+            resizeToAvoidBottomInset: false,
+            appBar: AppBar(
+              leading: Builder(builder: (BuildContext context) {
+                return IconButton(
+                  icon: Icon(Icons.arrow_back_ios),
+                  onPressed: () {
+                    Navigator.of(context).pop();
                   },
-            child: Text('J\'y vais!'),
-          )
-        ])));
+                  color: Theme.of(context).accentColor,
+                );
+              }),
+            ),
+            body: Column(children: [
+              Padding(
+                  padding: EdgeInsets.fromLTRB(30, 40, 30, 0),
+                  child: Text(
+                      'Ici tu peux rentrer le code de la salle à laquelle tu souhaites accéder.',
+                      style: Theme.of(context)
+                          .textTheme
+                          .headline1
+                          .copyWith(fontSize: 25))),
+              Padding(
+                  padding: EdgeInsets.fromLTRB(0, 100, 0, 0),
+                  child: Wrap(children: [
+                    Padding(
+                        padding: EdgeInsets.fromLTRB(20, 0, 20, 30),
+                        child: TextFormField(
+                          style: TextStyle(
+                              fontSize: 40, color: CustomColors.sakuraCream),
+                          controller: _controller,
+                          decoration: InputDecoration(
+                              filled: true,
+                              fillColor: CustomColors.sakuraDarker,
+                              focusColor: CustomColors.sakuraCream,
+                              border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(40.0)),
+                              hintText: 'AAAA'),
+                          textAlign: TextAlign.center,
+                          onChanged: (value) => _valueChanged(),
+                          onFieldSubmitted: (value) => _submit(value),
+                          inputFormatters: [
+                            MaskedInputFormatter('####',
+                                anyCharMatcher: RegExp(r'[a-zA-Z]')),
+                            UpperCaseTextFormatter()
+                          ],
+                          keyboardType: TextInputType.name,
+                        )),
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(80, 30, 80, 0),
+                      child: ElevatedButton(
+                          // disable button if value has no input
+                          onPressed: buttonDisabled
+                              ? null
+                              : () {
+                                  // hide keyboard after pressing button
+                                  FocusScope.of(context).unfocus();
+                                  _submit(_controller.text);
+                                },
+                          child: Text('J\'y vais!',
+                              style: buttonDisabled
+                                  ? TextStyle(color: CustomColors.sakuraDarker)
+                                  : Theme.of(context).textTheme.button),
+                          style: ButtonStyle(
+                              shape: MaterialStateProperty.all<
+                                      RoundedRectangleBorder>(
+                                  RoundedRectangleBorder(
+                                      borderRadius:
+                                          BorderRadius.circular(40.0))),
+                              padding:
+                                  MaterialStateProperty.all(EdgeInsets.all(20)),
+                              // take width of parent container
+                              minimumSize: MaterialStateProperty.all(
+                                  Size(double.infinity, 0)))),
+                    )
+                  ]))
+            ])));
   }
 
   void _submit(String code) async {

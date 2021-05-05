@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 
 class CustomColors {
-  static MaterialColor sakuraLight = MaterialColor(0xFFc3829e, {
-    50: Color.fromRGBO(195, 130, 158, .1),
-    100: Color.fromRGBO(195, 130, 158, .2),
-    200: Color.fromRGBO(195, 130, 158, .3),
-    300: Color.fromRGBO(195, 130, 158, .4),
-    400: Color.fromRGBO(195, 130, 158, .5),
-    500: Color.fromRGBO(195, 130, 158, .6),
-    600: Color.fromRGBO(195, 130, 158, .7),
-    700: Color.fromRGBO(195, 130, 158, .8),
-    800: Color.fromRGBO(195, 130, 158, .9),
-    900: Color.fromRGBO(195, 130, 158, 1),
+  static MaterialColor sakuraCream = MaterialColor(0xFFffe7de, {
+    50: Color.fromRGBO(255, 231, 222, .1),
+    100: Color.fromRGBO(255, 231, 222, .2),
+    200: Color.fromRGBO(255, 231, 222, .3),
+    300: Color.fromRGBO(255, 231, 222, .4),
+    400: Color.fromRGBO(255, 231, 222, .5),
+    500: Color.fromRGBO(255, 231, 222, .6),
+    600: Color.fromRGBO(255, 231, 222, .7),
+    700: Color.fromRGBO(255, 231, 222, .8),
+    800: Color.fromRGBO(255, 231, 222, .9),
+    900: Color.fromRGBO(255, 231, 222, 1),
   });
 
   static MaterialColor sakuraLighter = MaterialColor(0xFFe9b1cd, {
@@ -27,6 +27,19 @@ class CustomColors {
     900: Color.fromRGBO(233, 177, 205, 1),
   });
 
+  static MaterialColor sakuraLight = MaterialColor(0xFFc3829e, {
+    50: Color.fromRGBO(195, 130, 158, .1),
+    100: Color.fromRGBO(195, 130, 158, .2),
+    200: Color.fromRGBO(195, 130, 158, .3),
+    300: Color.fromRGBO(195, 130, 158, .4),
+    400: Color.fromRGBO(195, 130, 158, .5),
+    500: Color.fromRGBO(195, 130, 158, .6),
+    600: Color.fromRGBO(195, 130, 158, .7),
+    700: Color.fromRGBO(195, 130, 158, .8),
+    800: Color.fromRGBO(195, 130, 158, .9),
+    900: Color.fromRGBO(195, 130, 158, 1),
+  });
+
   static MaterialColor sakuraDark = MaterialColor(0xFF562135, {
     50: Color.fromRGBO(86, 33, 53, .1),
     100: Color.fromRGBO(86, 33, 53, .2),
@@ -40,16 +53,29 @@ class CustomColors {
     900: Color.fromRGBO(86, 33, 53, 1),
   });
 
-  static MaterialColor sakuraCream = MaterialColor(0xFFffe7de, {
-    50: Color.fromRGBO(255, 231, 222, .1),
-    100: Color.fromRGBO(255, 231, 222, .2),
-    200: Color.fromRGBO(255, 231, 222, .3),
-    300: Color.fromRGBO(255, 231, 222, .4),
-    400: Color.fromRGBO(255, 231, 222, .5),
-    500: Color.fromRGBO(255, 231, 222, .6),
-    600: Color.fromRGBO(255, 231, 222, .7),
-    700: Color.fromRGBO(255, 231, 222, .8),
-    800: Color.fromRGBO(255, 231, 222, .9),
-    900: Color.fromRGBO(255, 231, 222, 1),
+  static MaterialColor sakuraDarker = MaterialColor(0xFF441a2a, {
+    50: Color.fromRGBO(68, 26, 42, .1),
+    100: Color.fromRGBO(68, 26, 42, .2),
+    200: Color.fromRGBO(68, 26, 42, .3),
+    300: Color.fromRGBO(68, 26, 42, .4),
+    400: Color.fromRGBO(68, 26, 42, .5),
+    500: Color.fromRGBO(68, 26, 42, .6),
+    600: Color.fromRGBO(68, 26, 42, .7),
+    700: Color.fromRGBO(68, 26, 42, .8),
+    800: Color.fromRGBO(68, 26, 42, .9),
+    900: Color.fromRGBO(68, 26, 42, 1),
+  });
+
+  static MaterialColor darkGrey = MaterialColor(0xFF181818, {
+    50: Color.fromRGBO(24, 24, 24, .1),
+    100: Color.fromRGBO(24, 24, 24, .2),
+    200: Color.fromRGBO(24, 24, 24, .3),
+    300: Color.fromRGBO(24, 24, 24, .4),
+    400: Color.fromRGBO(24, 24, 24, .5),
+    500: Color.fromRGBO(24, 24, 24, .6),
+    600: Color.fromRGBO(24, 24, 24, .7),
+    700: Color.fromRGBO(24, 24, 24, .8),
+    800: Color.fromRGBO(24, 24, 24, .9),
+    900: Color.fromRGBO(24, 24, 24, 1),
   });
 }
