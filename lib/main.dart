@@ -6,6 +6,7 @@ void main() {
   runApp(MusiquamiApp());
 }
 
+// TODO mettre une police plus sympa
 class MusiquamiApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
