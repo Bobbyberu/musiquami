@@ -24,6 +24,8 @@ dependencies:
   easy_debounce: ^2.0.0
   another_flushbar: ^1.10.20
   connectivity: ^3.0.3
+  flutter_launcher_icons: ^0.9.0
+  flutter_native_splash: ^1.1.8+4
 
 dev_dependencies:
   flutter_test:
@@ -34,3 +36,4 @@ flutter:
 
   assets:
     - secrets.json
+    - images/logo.jpg
