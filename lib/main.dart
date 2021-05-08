@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:musiquamiapp/utils/CustomColors.dart';
 import 'package:musiquamiapp/widgets/home/Home.dart';
 
+// TODO empêcher l'appli de se mettre en paysage
 void main() {
   // "transparent" status bar
   SystemChrome.setSystemUIOverlayStyle(
@@ -36,7 +37,7 @@ class MusiquamiApp extends StatelessWidget {
             // top headline
             headline1: TextStyle(
                 fontSize: 32,
-                fontWeight: FontWeight.bold,
+                fontWeight: FontWeight.w900,
                 color: CustomColors.sakuraCream),
             // input text style
             headline2: TextStyle(color: CustomColors.sakuraCream, fontSize: 18),
@@ -50,7 +51,7 @@ class MusiquamiApp extends StatelessWidget {
             bodyText2: TextStyle(
                 color: CustomColors.sakuraLighter,
                 fontSize: 20,
-                fontWeight: FontWeight.bold),
+                fontWeight: FontWeight.w900),
           ),
           buttonTheme: ButtonThemeData(buttonColor: CustomColors.sakuraLight),
           elevatedButtonTheme: ElevatedButtonThemeData(

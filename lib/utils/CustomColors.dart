@@ -66,7 +66,7 @@ class CustomColors {
     900: Color.fromRGBO(68, 26, 42, 1),
   });
 
-  static MaterialColor darkGrey = MaterialColor(0xFF181818, {
+  static MaterialColor darkGrey = MaterialColor(0xFF323223, {
     50: Color.fromRGBO(24, 24, 24, .1),
     100: Color.fromRGBO(24, 24, 24, .2),
     200: Color.fromRGBO(24, 24, 24, .3),

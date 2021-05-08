@@ -16,7 +16,7 @@ class ConfirmationDialog extends StatelessWidget {
         style: Theme.of(context)
             .textTheme
             .bodyText1
-            .copyWith(fontWeight: FontWeight.bold),
+            .copyWith(fontWeight: FontWeight.w900),
       ),
       content: SingleChildScrollView(
         child: RichText(
@@ -26,10 +26,10 @@ class ConfirmationDialog extends StatelessWidget {
               TextSpan(text: 'Tu vas mettre '),
               TextSpan(
                   text: track.name,
-                  style: TextStyle(fontWeight: FontWeight.bold)),
+                  style: TextStyle(fontWeight: FontWeight.w900)),
               TextSpan(
                   text:
-                      ' de ${_getFirstArtist(track.artists)} dans la file d\'attente.'),
+                      ' de ${_getFirstArtist(track.artists)} dans la file d\'attente. '),
               TextSpan(text: 'C\'est parti tu nous mets bien ?')
             ])),
       ),

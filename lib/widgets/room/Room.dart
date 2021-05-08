@@ -193,6 +193,7 @@ class _RoomState extends State<Room> {
             error.response.data['error']['reason'] == 'NO_ACTIVE_DEVICE') {
           _displaySnackbar(error404Queue, true, FlushbarPosition.BOTTOM);
         } else {
+          print(error.response.toString());
           _displaySnackbar('Erreur', true, FlushbarPosition.BOTTOM);
         }
       });

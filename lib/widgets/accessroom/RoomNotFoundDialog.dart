@@ -10,7 +10,7 @@ class RoomNotFoundDialog extends StatelessWidget {
           style: Theme.of(context)
               .textTheme
               .bodyText1
-              .copyWith(fontWeight: FontWeight.bold),
+              .copyWith(fontWeight: FontWeight.w900),
         ),
         content: SingleChildScrollView(
           child: ListBody(

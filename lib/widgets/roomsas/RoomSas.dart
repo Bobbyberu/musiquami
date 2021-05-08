@@ -6,7 +6,6 @@ import 'package:musiquamiapp/widgets/room/Room.dart';
 class RoomSas extends StatelessWidget {
   RoomSas(this.roomCode);
 
-  static const routeName = '/roomsas';
   final String roomCode;
 
   @override

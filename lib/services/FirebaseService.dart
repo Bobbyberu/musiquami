@@ -5,24 +5,33 @@ import 'dart:math';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:musiquamiapp/services/SpotifyService.dart';
 
+// TODO réorganiser tout ça
+// moins de méthodes statiques
+// documenter les méthodes
+
 class FirebaseService {
   static Future<Map> createRoom(Map<dynamic, dynamic> credentials) async {
-    final userId = await SpotifyService.getUserId(credentials['access_token']);
-    final room = await getRoomFromUser(userId)
-        .then((snapshot) => snapshot.value)
-        .catchError((err) => print('error: $err'));
-    var roomData = _buildRoomData(credentials, userId);
-    // if user has already created room get code
-    // else generate new code
-    final roomCode =
-        room != null ? room.entries.first.key : _generateRoomCode();
-    await FirebaseDatabase.instance
-        .reference()
-        .child('room/$roomCode')
-        .set(roomData);
+    final userInfo =
+        await SpotifyService.getUserInfo(credentials['access_token']);
+    if (userInfo['product'] != 'premium') {
+      return null;
+    } else {
+      final room = await getRoomFromUser(userInfo['id'])
+          .then((snapshot) => snapshot.value)
+          .catchError((err) => print('error: $err'));
+      var roomData = _buildRoomData(credentials, userInfo['id']);
+      // if user has already created room get code
+      // else generate new code
+      final roomCode =
+          room != null ? room.entries.first.key : _generateRoomCode();
+      await FirebaseDatabase.instance
+          .reference()
+          .child('room/$roomCode')
+          .set(roomData);
 
-    roomData['roomCode'] = roomCode;
-    return roomData;
+      roomData['roomCode'] = roomCode;
+      return roomData;
+    }
   }
 
   static Map<String, dynamic> _buildRoomData(

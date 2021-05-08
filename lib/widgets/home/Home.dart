@@ -46,12 +46,10 @@ class _HomeState extends State<Home> {
 
   @override
   void dispose() {
-    print('dispose main');
     super.dispose();
     subscription.cancel();
   }
 
-// TODO gérer si pas spotify premium
   @override
   Widget build(BuildContext context) {
     return Scaffold(
