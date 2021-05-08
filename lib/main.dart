@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:musiquamiapp/utils/CustomColors.dart';
 import 'package:musiquamiapp/widgets/home/Home.dart';
 
 void main() {
+  // "transparent" status bar
+  SystemChrome.setSystemUIOverlayStyle(
+      SystemUiOverlayStyle(statusBarColor: Colors.transparent));
   runApp(MusiquamiApp());
 }
 
@@ -16,8 +20,11 @@ class MusiquamiApp extends StatelessWidget {
       theme: ThemeData(
           fontFamily: 'Lato',
           primarySwatch: CustomColors.sakuraLight,
+          backgroundColor: CustomColors.sakuraDark,
           appBarTheme: AppBarTheme(
-              backgroundColor: CustomColors.sakuraDark, elevation: 0.0),
+              brightness: Brightness.dark,
+              backgroundColor: CustomColors.sakuraDark,
+              elevation: 0.0),
           accentColor: CustomColors.sakuraCream,
           disabledColor: CustomColors.sakuraDarker,
           inputDecorationTheme: InputDecorationTheme(

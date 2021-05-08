@@ -23,8 +23,6 @@ class Room extends StatefulWidget {
   _RoomState createState() => _RoomState(code);
 }
 
-// TODO status bar transparente + police en blanc
-
 class _RoomState extends State<Room> {
   final String code;
   SpotifyService spotify;
@@ -105,7 +103,6 @@ class _RoomState extends State<Room> {
                               child: Wrap(children: [
                                 Padding(
                                     padding: EdgeInsets.only(bottom: 40),
-                                    // TODO fixer emoji à la ligne
                                     child: Text('Bienvenue 👋',
                                         style: Theme.of(context)
                                             .textTheme
