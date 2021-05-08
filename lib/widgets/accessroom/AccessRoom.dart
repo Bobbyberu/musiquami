@@ -44,7 +44,7 @@ class _AccessRoomState extends State<AccessRoom> {
             ),
             body: Column(children: [
               Padding(
-                  padding: EdgeInsets.fromLTRB(30, 40, 30, 0),
+                  padding: EdgeInsets.only(left: 30, top: 40, right: 30),
                   child: Text(
                       'Ici tu peux rentrer le code de la salle à laquelle tu souhaites accéder.',
                       style: Theme.of(context)
@@ -52,10 +52,11 @@ class _AccessRoomState extends State<AccessRoom> {
                           .headline1
                           .copyWith(fontSize: 25))),
               Padding(
-                  padding: EdgeInsets.fromLTRB(0, 100, 0, 0),
+                  padding: EdgeInsets.only(top: 100),
                   child: Wrap(children: [
                     Padding(
-                        padding: EdgeInsets.fromLTRB(20, 0, 20, 30),
+                        padding:
+                            EdgeInsets.only(left: 20, right: 20, bottom: 30),
                         child: TextFormField(
                           style: Theme.of(context)
                               .textTheme
@@ -74,7 +75,7 @@ class _AccessRoomState extends State<AccessRoom> {
                           keyboardType: TextInputType.name,
                         )),
                     Padding(
-                      padding: EdgeInsets.fromLTRB(80, 30, 80, 0),
+                      padding: EdgeInsets.only(left: 80, top: 30, right: 80),
                       child: ElevatedButton(
                           // disable button if value has no input
                           onPressed: buttonDisabled

@@ -15,6 +15,7 @@ class MusiquamiApp extends StatelessWidget {
       title: 'Musiquami',
       home: Home(),
       theme: ThemeData(
+          fontFamily: 'Proxima Nova',
           primarySwatch: CustomColors.sakuraLight,
           appBarTheme: AppBarTheme(
               backgroundColor: CustomColors.sakuraDark, elevation: 0.0),

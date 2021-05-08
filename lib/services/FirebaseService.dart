@@ -93,4 +93,8 @@ class FirebaseService {
     return String.fromCharCodes(Iterable.generate(
         4, (_) => _chars.codeUnitAt(_rnd.nextInt(_chars.length))));
   }
+
+  static void deleteRoom(String code) async {
+    await FirebaseDatabase.instance.reference().child('room/$code').set(null);
+  }
 }

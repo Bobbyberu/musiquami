@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:musiquamiapp/services/LocalStorageService.dart';
 import 'package:musiquamiapp/widgets/room/Room.dart';
 
 class RoomSas extends StatelessWidget {
@@ -10,6 +11,8 @@ class RoomSas extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    LocalStorageService.saveSpotifyRoomOwned(roomCode);
+
     return WillPopScope(
         // pop straight to homepage instead of SpotifyAuth webpage
         onWillPop: () async {
@@ -30,17 +33,17 @@ class RoomSas extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   Padding(
-                      padding: EdgeInsets.fromLTRB(30, 0, 30, 0),
+                      padding: EdgeInsets.only(left: 30, right: 30),
                       child: Wrap(children: [
                         Padding(
-                            padding: EdgeInsets.fromLTRB(0, 0, 0, 40),
+                            padding: EdgeInsets.only(bottom: 40),
                             child: Text('Ta salle est créée !',
                                 style: Theme.of(context)
                                     .textTheme
                                     .headline1
                                     .copyWith(fontSize: 30))),
                         Text(
-                            'Les autres peuvent y avoir accès en rentrant le code suivant :',
+                            'Tes amis peuvent y avoir accès en rentrant le code suivant :',
                             style: Theme.of(context)
                                 .textTheme
                                 .headline1
@@ -52,7 +55,7 @@ class RoomSas extends StatelessWidget {
                           .headline1
                           .copyWith(fontSize: 45)),
                   Padding(
-                      padding: EdgeInsets.fromLTRB(60, 0, 60, 0),
+                      padding: EdgeInsets.only(left: 60, right: 60),
                       child: ElevatedButton(
                         onPressed: () => Navigator.of(context).push(
                             new MaterialPageRoute(

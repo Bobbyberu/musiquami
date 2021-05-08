@@ -63,19 +63,19 @@ class _HomeState extends State<Home> {
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                         Padding(
-                          padding: EdgeInsets.fromLTRB(30, 0, 30, 0),
+                          padding: EdgeInsets.only(left: 30, right: 30),
                           child: Text(
                             'Mettez votre propre musique chez vos amis dès maintenant.',
                             style: Theme.of(context).textTheme.headline1,
                           ),
                         ),
                         Padding(
-                            padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
+                            padding: EdgeInsets.only(left: 20, right: 20),
                             child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: <Widget>[
                                   Padding(
-                                      padding: EdgeInsets.fromLTRB(0, 0, 0, 20),
+                                      padding: EdgeInsets.only(bottom: 20),
                                       child: ElevatedButton(
                                           onPressed: () => Navigator.push(
                                               context,
@@ -94,7 +94,7 @@ class _HomeState extends State<Home> {
                                               .elevatedButtonTheme
                                               .style)),
                                   Padding(
-                                      padding: EdgeInsets.fromLTRB(0, 20, 0, 0),
+                                      padding: EdgeInsets.only(top: 20),
                                       child: ElevatedButton(
                                           onPressed: () => Navigator.push(
                                               context,

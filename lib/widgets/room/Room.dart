@@ -8,8 +8,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:musiquamiapp/entities/Track.dart';
 import 'package:musiquamiapp/services/FirebaseService.dart';
+import 'package:musiquamiapp/services/LocalStorageService.dart';
 import 'package:musiquamiapp/services/SpotifyService.dart';
 import 'package:musiquamiapp/utils/CustomColors.dart';
+import 'package:musiquamiapp/widgets/home/Home.dart';
 import 'package:musiquamiapp/widgets/room/ConfirmationDialog.dart';
 
 class Room extends StatefulWidget {
@@ -21,11 +23,14 @@ class Room extends StatefulWidget {
   _RoomState createState() => _RoomState(code);
 }
 
+// TODO status bar transparente + police en blanc
+
 class _RoomState extends State<Room> {
   final String code;
   SpotifyService spotify;
   List<Track> tracks = [];
   bool showTracks = false;
+  bool isRoomOwned = false;
   var _searchController = TextEditingController();
   static StreamSubscription<Event> credentialsChangedListener;
 
@@ -33,7 +38,7 @@ class _RoomState extends State<Room> {
       "Il y a eu problème avec la connexion à Spotify. Essaye de recharger la salle";
   final error404Queue =
       "Aucun appareil du propriétaire de la salle ne joue de musique. " +
-          "Démarre un son sur un appareil connecté au compte du propriétaire et réessaye!";
+          "Démarre un son sur un appareil connecté au compte du propriétaire et réessaye !";
 
   _RoomState(this.code);
 
@@ -42,6 +47,7 @@ class _RoomState extends State<Room> {
     super.initState();
     initRoom();
     initCredentialsChangedListener();
+    initRoomOwned();
     _searchController
         .addListener(() async => await _getTracks(_searchController.text));
   }
@@ -56,7 +62,6 @@ class _RoomState extends State<Room> {
             credentials['refreshToken'], credentials['expiration'], code);
       });
       if (spotify.isTokenExpired()) {
-        print('on va rafraichir');
         await spotify.refreshCredentials();
       }
     });
@@ -65,10 +70,16 @@ class _RoomState extends State<Room> {
   void initCredentialsChangedListener() {
     credentialsChangedListener =
         FirebaseService.getCredentialsChangedListener(code, (event) {
-      debugPrint('nouvel évènement sur la room $code');
       setState(() {
         spotify.updateCredentials(event.snapshot.value);
       });
+    });
+  }
+
+  void initRoomOwned() async {
+    bool result = await LocalStorageService.iSpotifyRoomOwned(code);
+    setState(() {
+      isRoomOwned = result;
     });
   }
 
@@ -89,10 +100,12 @@ class _RoomState extends State<Room> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Padding(
-                              padding: EdgeInsets.fromLTRB(30, 0, 30, 50),
+                              padding: EdgeInsets.only(
+                                  left: 30, right: 30, bottom: 50),
                               child: Wrap(children: [
                                 Padding(
-                                    padding: EdgeInsets.fromLTRB(0, 0, 0, 40),
+                                    padding: EdgeInsets.only(bottom: 40),
+                                    // TODO fixer emoji à la ligne
                                     child: Text('Bienvenue 👋',
                                         style: Theme.of(context)
                                             .textTheme
@@ -109,7 +122,26 @@ class _RoomState extends State<Room> {
                               style: Theme.of(context)
                                   .textTheme
                                   .headline1
-                                  .copyWith(fontSize: 45))
+                                  .copyWith(fontSize: 45)),
+                          if (isRoomOwned)
+                            Padding(
+                                padding: EdgeInsets.only(
+                                    left: 40, right: 40, top: 80),
+                                child: ElevatedButton(
+                                    onPressed: () {
+                                      // delete room then back to homepage
+                                      FirebaseService.deleteRoom(code);
+                                      Navigator.of(context).push(
+                                          new MaterialPageRoute(
+                                              builder: (context) => Home()));
+                                    },
+                                    child: Text('Supprimer cette salle',
+                                        style: TextStyle(
+                                            fontSize: 22,
+                                            color: CustomColors.sakuraCream)),
+                                    style: Theme.of(context)
+                                        .elevatedButtonTheme
+                                        .style))
                         ]),
                   Stack(children: [
                     // searchbar background is blurred
@@ -155,14 +187,16 @@ class _RoomState extends State<Room> {
       spotify
           .queue(track.uri)
           .then((value) => _displaySnackbar(
-              'Le titre a été ajouté à la file d\'attente !', false))
+              'Le titre a été ajouté à la file d\'attente !',
+              false,
+              FlushbarPosition.BOTTOM))
           .catchError((error) {
         // room owner has no music playing on any of his spotify devices
         if (error.response.statusCode == 404 &&
             error.response.data['error']['reason'] == 'NO_ACTIVE_DEVICE') {
-          _displaySnackbar(error404Queue, true);
+          _displaySnackbar(error404Queue, true, FlushbarPosition.BOTTOM);
         } else {
-          _displaySnackbar('Erreur', true);
+          _displaySnackbar('Erreur', true, FlushbarPosition.BOTTOM);
         }
       });
       setState(() {
@@ -204,7 +238,7 @@ class _RoomState extends State<Room> {
             Image.network(track.imageUrl),
             Expanded(
                 child: Padding(
-                    padding: EdgeInsets.fromLTRB(10, 0, 0, 0),
+                    padding: EdgeInsets.only(left: 10),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -234,13 +268,12 @@ class _RoomState extends State<Room> {
     );
   }
 
-  void _displaySnackbar(String message, bool isError) {
+  void _displaySnackbar(String message, bool isError, flushbarPosition) {
     Flushbar(
         message: message,
         messageColor: CustomColors.sakuraCream,
         duration: Duration(seconds: 7),
-        flushbarPosition:
-            isError ? FlushbarPosition.TOP : FlushbarPosition.BOTTOM,
+        flushbarPosition: flushbarPosition,
         margin: EdgeInsets.all(8),
         borderRadius: BorderRadius.circular(8),
         icon: Icon(
@@ -276,9 +309,9 @@ class _RoomState extends State<Room> {
           });
         }).catchError((error) {
           if (error.response != null && error.response.statusCode == 401) {
-            _displaySnackbar(error401, true);
+            _displaySnackbar(error401, true, FlushbarPosition.TOP);
           } else {
-            _displaySnackbar('Erreur', true);
+            _displaySnackbar('Erreur', true, FlushbarPosition.TOP);
           }
         });
       } else {
