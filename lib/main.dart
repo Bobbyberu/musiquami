@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:musiquamiapp/utils/CustomColors.dart';
 import 'package:musiquamiapp/widgets/home/Home.dart';
 
-// TODO empêcher l'appli de se mettre en paysage
 void main() {
   // "transparent" status bar
   SystemChrome.setSystemUIOverlayStyle(
@@ -14,6 +13,8 @@ void main() {
 class MusiquamiApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    // app should only be displayed in portrait
+    SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Musiquami',
@@ -23,6 +24,7 @@ class MusiquamiApp extends StatelessWidget {
           primarySwatch: CustomColors.sakuraLight,
           backgroundColor: CustomColors.sakuraDark,
           appBarTheme: AppBarTheme(
+              // android/ios status bar should be displayed using bright font color
               brightness: Brightness.dark,
               backgroundColor: CustomColors.sakuraDark,
               elevation: 0.0),
