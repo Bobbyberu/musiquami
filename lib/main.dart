@@ -6,7 +6,6 @@ void main() {
   runApp(MusiquamiApp());
 }
 
-// TODO mettre une police plus sympa
 class MusiquamiApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -15,7 +14,7 @@ class MusiquamiApp extends StatelessWidget {
       title: 'Musiquami',
       home: Home(),
       theme: ThemeData(
-          fontFamily: 'Proxima Nova',
+          fontFamily: 'Lato',
           primarySwatch: CustomColors.sakuraLight,
           appBarTheme: AppBarTheme(
               backgroundColor: CustomColors.sakuraDark, elevation: 0.0),

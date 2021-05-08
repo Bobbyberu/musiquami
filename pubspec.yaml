@@ -37,6 +37,17 @@ flutter_icons:
   ios: true
   image_path: "assets/images/logo.jpg"
 
+flutter:
+  uses-material-design: true
+  fonts:
+    - family: Lato
+      fonts:
+        - asset: assets/fonts/Lato-Regular.ttf
+        - asset: assets/fonts/Lato-Italic.ttf
+          style: italic
+        - asset: assets/fonts/Lato-Bold.ttf
+          weight: 700
+
   assets:
     - secrets.json
     - assets/images/logo.jpg
