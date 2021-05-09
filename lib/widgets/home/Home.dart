@@ -63,7 +63,7 @@ class _HomeState extends State<Home> {
                         Padding(
                           padding: EdgeInsets.only(left: 30, right: 30),
                           child: Text(
-                            'Mettez votre propre musique chez vos amis dès maintenant.',
+                            'Mettez votre propre musique chez vos amis dès maintenant avec Musiquami.',
                             style: Theme.of(context).textTheme.headline1,
                           ),
                         ),

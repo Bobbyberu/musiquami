@@ -21,12 +21,13 @@ dependencies:
   json_annotation: ^4.0.1
   dio: ^3.0.10
   flutter_typeahead: ^3.1.1
-  easy_debounce: ^2.0.0
   another_flushbar: ^1.10.20
   connectivity: ^3.0.3
   flutter_launcher_icons: ^0.9.0
   flutter_native_splash: ^1.1.8+4
   shared_preferences: ^2.0.5
+  loader_overlay: ^2.0.1
+  skeleton_text: ^3.0.0
 
 dev_dependencies:
   flutter_test:
