@@ -5,6 +5,7 @@ import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:musiquamiapp/utils/CustomColors.dart';
 import 'package:musiquamiapp/widgets/accessroom/AccessRoom.dart';
+import 'package:musiquamiapp/widgets/common/BlurredLogo.dart';
 import 'package:musiquamiapp/widgets/home/SpotifyAuth.dart';
 import 'package:musiquamiapp/widgets/offline/Offline.dart';
 import 'package:page_transition/page_transition.dart';
@@ -58,15 +59,7 @@ class _HomeState extends State<Home> {
             child: connectivityResult == ConnectivityResult.none
                 ? Offline()
                 : Stack(children: [
-                    Align(
-                        alignment: FractionalOffset.bottomCenter,
-                        child: ImageFiltered(
-                          imageFilter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
-                          child: Image.asset(
-                            'assets/images/logo_transparent.png',
-                            fit: BoxFit.contain,
-                          ),
-                        )),
+                    BlurredLogo(),
                     Column(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
