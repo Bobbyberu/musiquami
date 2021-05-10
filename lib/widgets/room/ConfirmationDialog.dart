@@ -35,12 +35,15 @@ class ConfirmationDialog extends StatelessWidget {
       ),
       actions: <Widget>[
         TextButton(
-          child: Text('Non'),
+          child: Text('Non', style: TextStyle(fontWeight: FontWeight.w900)),
           onPressed: () {
             Navigator.of(context).pop();
           },
         ),
-        TextButton(child: Text('Allez!'), onPressed: onConfirm),
+        TextButton(
+            child:
+                Text('Allez !', style: TextStyle(fontWeight: FontWeight.w900)),
+            onPressed: onConfirm),
       ],
     );
   }

@@ -11,9 +11,9 @@ import 'package:musiquamiapp/services/FirebaseService.dart';
 import 'package:musiquamiapp/services/LocalStorageService.dart';
 import 'package:musiquamiapp/services/SpotifyService.dart';
 import 'package:musiquamiapp/utils/CustomColors.dart';
-import 'package:musiquamiapp/widgets/home/Home.dart';
 import 'package:musiquamiapp/widgets/room/ConfirmationDialog.dart';
-import 'package:skeleton_text/skeleton_text.dart';
+import 'package:musiquamiapp/widgets/room/RoomPresentation.dart';
+import 'package:musiquamiapp/widgets/room/TrackListView.dart';
 
 class Room extends StatefulWidget {
   final String code;
@@ -102,59 +102,11 @@ class _RoomState extends State<Room> {
                 resizeToAvoidBottomInset: false,
                 body: SafeArea(
                   child: Stack(
-                    //mainAxisAlignment: MainAxisAlignment.start,
                     children: [
                       if (showTracks)
-                        _buildTrackListView()
+                        TrackListView(tracks, _showConfirmationDialog)
                       else
-                        Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Padding(
-                                  padding: EdgeInsets.only(
-                                      left: 30, right: 30, bottom: 50),
-                                  child: Wrap(children: [
-                                    Padding(
-                                        padding: EdgeInsets.only(bottom: 40),
-                                        child: Text('Bienvenue 👋',
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .headline1
-                                                .copyWith(fontSize: 30))),
-                                    Text(
-                                        'Tu peux inviter d\'autres personnes en leur donnant ce code :',
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .headline1
-                                            .copyWith(fontSize: 25))
-                                  ])),
-                              Text(code,
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .headline1
-                                      .copyWith(fontSize: 45)),
-                              if (isRoomOwned)
-                                Padding(
-                                    padding: EdgeInsets.only(
-                                        left: 40, right: 40, top: 80),
-                                    child: ElevatedButton(
-                                        onPressed: () {
-                                          // delete room then back to homepage
-                                          FirebaseService.deleteRoom(code);
-                                          Navigator.of(context).push(
-                                              new MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      Home()));
-                                        },
-                                        child: Text('Supprimer cette salle',
-                                            style: TextStyle(
-                                                fontSize: 22,
-                                                color:
-                                                    CustomColors.sakuraCream)),
-                                        style: Theme.of(context)
-                                            .elevatedButtonTheme
-                                            .style))
-                            ]),
+                        RoomPresentation(code, isRoomOwned),
                       Stack(children: [
                         // searchbar background is blurred
                         ClipRect(
@@ -226,135 +178,6 @@ class _RoomState extends State<Room> {
         builder: (BuildContext context) {
           return dialog;
         });
-  }
-
-  Widget _buildTrackListView() {
-    return FutureBuilder(
-        future: tracks,
-        builder: (context, snapshot) {
-          if (snapshot.hasError) {
-            return Container();
-          } else if (!snapshot.hasData ||
-              snapshot.connectionState == ConnectionState.waiting) {
-            return ListView.builder(
-                padding: EdgeInsets.fromLTRB(10, 100, 10, 10),
-                itemCount: 10,
-                itemBuilder: (context, index) => Container(
-                      child: Padding(
-                        padding: EdgeInsets.only(bottom: 20),
-                        child: Row(
-                          children: [
-                            SkeletonAnimation(
-                                shimmerColor: CustomColors.sakuraLight,
-                                child: Container(
-                                  height: 60,
-                                  width: 60,
-                                  decoration: BoxDecoration(
-                                      color: Theme.of(context).disabledColor),
-                                )),
-                            Expanded(
-                                child: Padding(
-                                    padding: EdgeInsets.only(left: 10),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Padding(
-                                            padding:
-                                                EdgeInsets.only(bottom: 10),
-                                            child: SkeletonAnimation(
-                                                shimmerColor:
-                                                    CustomColors.sakuraLight,
-                                                child: Container(
-                                                  height: 15,
-                                                  width: MediaQuery.of(context)
-                                                          .size
-                                                          .width *
-                                                      0.60,
-                                                  decoration: BoxDecoration(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              10.0),
-                                                      color: Theme.of(context)
-                                                          .disabledColor),
-                                                ))),
-                                        SkeletonAnimation(
-                                            shimmerColor:
-                                                CustomColors.sakuraLight,
-                                            child: Container(
-                                              height: 15,
-                                              width: MediaQuery.of(context)
-                                                      .size
-                                                      .width *
-                                                  0.50,
-                                              decoration: BoxDecoration(
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          10.0),
-                                                  color: Theme.of(context)
-                                                      .disabledColor),
-                                            ))
-                                      ],
-                                    )))
-                          ],
-                        ),
-                      ),
-                    ));
-          }
-          return ListView.separated(
-            padding: EdgeInsets.fromLTRB(10, 100, 10, 10),
-            itemBuilder: (context, i) =>
-                _buildTrackRow(snapshot.data[i] as Track),
-            separatorBuilder: (BuildContext context, int index) =>
-                const Divider(),
-            itemCount: snapshot.data.length,
-            // hide keyboard on scroll
-            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-          );
-        });
-  }
-
-  Widget _buildTrackRow(Track track) {
-    return GestureDetector(
-      // make all gesture detector tappable, not just text and image
-      behavior: HitTestBehavior.translucent,
-      key: Key(track.uri),
-      child: Container(
-        child: Row(
-          children: [
-            Image.network(track.imageUrl),
-            Expanded(
-                child: Padding(
-                    padding: EdgeInsets.only(left: 10),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        Text(
-                          '${track.name}',
-                          overflow: TextOverflow.ellipsis,
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodyText1
-                              .copyWith(fontWeight: FontWeight.bold),
-                        ),
-                        Text(
-                          '${track.artists}',
-                          overflow: TextOverflow.ellipsis,
-                          style: Theme.of(context).textTheme.bodyText1,
-                        ),
-                      ],
-                    )))
-          ],
-        ),
-      ),
-      onTap: () {
-        FocusScope.of(context).unfocus();
-        _showConfirmationDialog(track);
-      },
-    );
   }
 
   void _displaySnackbar(String message, bool isError, flushbarPosition) {

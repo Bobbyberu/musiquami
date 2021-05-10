@@ -17,8 +17,8 @@ class Track {
     return Track(
         uri: json['uri'] as String,
         name: json['name'] as String,
-        // TODO images un peu pixelisées, p-e prendre résolution au-dessus
-        imageUrl: json['album']['images'].last['url'] as String,
+        // take album image with second best resolution
+        imageUrl: json['album']['images'][1]['url'] as String,
         artists: artists);
   }
 }
