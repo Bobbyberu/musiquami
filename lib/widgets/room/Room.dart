@@ -93,7 +93,6 @@ class _RoomState extends State<Room> {
     });
   }
 
-// TODO enlever autorrection clavier sur la barre de recherche
   @override
   Widget build(BuildContext context) {
     return Theme(
@@ -170,6 +169,8 @@ class _RoomState extends State<Room> {
                         Padding(
                             padding: EdgeInsets.all(10),
                             child: TextField(
+                              autocorrect: false,
+                              enableSuggestions: false,
                               style: Theme.of(context).textTheme.headline2,
                               decoration: InputDecoration(
                                   fillColor: CustomColors.sakuraLight.shade100,
