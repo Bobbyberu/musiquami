@@ -50,3 +50,4 @@ flutter:
   assets:
     - secrets.json
     - assets/images/logo.jpg
+    - assets/images/logo_transparent.png
