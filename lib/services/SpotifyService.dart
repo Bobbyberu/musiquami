@@ -1,4 +1,7 @@
+import 'dart:collection';
+
 import 'package:dio/dio.dart';
+import 'package:musiquamiapp/entities/Track.dart';
 import 'package:musiquamiapp/services/SecretService.dart';
 
 import 'FirebaseService.dart';
@@ -36,15 +39,13 @@ class SpotifyService {
         data: requestBody,
         options: Options(contentType: Headers.formUrlEncodedContentType));
 
-    final roomData = await FirebaseService.createRoom(response.data);
-    if (roomData != null) {
-      final credentials = roomData['credentials'];
-
+    final credentials = await FirebaseService.createRoom(response.data);
+    if (credentials != null) {
       return SpotifyService(
           credentials['accessToken'],
           credentials['refreshToken'],
           credentials['expiration'],
-          roomData['roomCode']);
+          credentials['roomCode']);
     } else {
       return null;
     }
@@ -127,5 +128,38 @@ class SpotifyService {
     }
     return await Dio().request(url,
         options: Options(headers: _buildAuthorizationHeader(), method: method));
+  }
+
+  Future<Response> getRecentlyPlayedTracks(int after) async {
+    final params = {'after': after.toString(), 'limit': '30'};
+    return await _requestApi(
+        _buildUrl('me/player/recently-played', params), 'get');
+  }
+
+  Future<List> updateQueue(Track track) async {
+    final queueInfo = await FirebaseService.getQueueInfo(roomCode)
+        .then((snapshot) => snapshot.value);
+
+    Queue tracksQueue;
+    if (queueInfo != null) {
+      tracksQueue = Queue.from(queueInfo['tracks']);
+      // get previously played track since last database's queue update
+      final recentlyPlayedTracksLength =
+          await getRecentlyPlayedTracks(queueInfo['lastUpdate'])
+              .then((response) => response.data['items'].length);
+      // removing all tracks that has been played in database's queue
+      print('recently played: $recentlyPlayedTracksLength');
+      for (var i = 1; i <= recentlyPlayedTracksLength; i++) {
+        tracksQueue.removeFirst();
+      }
+    } else {
+      tracksQueue = Queue();
+    }
+    tracksQueue.add(track.toMap());
+    await FirebaseService.saveNewQueue(
+        roomCode, tracksQueue, DateTime.now().millisecondsSinceEpoch);
+
+    // returning Queue<Track> instead of Queue<Map>
+    return tracksQueue.map((e) => Track.fromSnapshot(e)).toList();
   }
 }

@@ -13,6 +13,7 @@ class AccessRoom extends StatefulWidget {
   _AccessRoomState createState() => _AccessRoomState();
 }
 
+// TODO auto focus clavier en arrivant sur la page
 class _AccessRoomState extends State<AccessRoom> {
   String code;
   bool buttonDisabled = true;

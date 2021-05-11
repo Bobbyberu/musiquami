@@ -1,8 +1,10 @@
 import 'dart:async';
+import 'dart:collection';
 import 'dart:core';
 import 'dart:math';
 
 import 'package:firebase_database/firebase_database.dart';
+import 'package:musiquamiapp/entities/Track.dart';
 import 'package:musiquamiapp/services/SpotifyService.dart';
 
 // TODO gérer code dupliqués
@@ -14,6 +16,7 @@ class FirebaseService {
     if (userInfo['product'] != 'premium') {
       return null;
     } else {
+      // TODO changer roomData pour roomCredentials
       final room = await getRoomFromUser(userInfo['id'])
           .then((snapshot) => snapshot.value)
           .catchError((err) => print('error: $err'));
@@ -27,7 +30,7 @@ class FirebaseService {
 
       await FirebaseDatabase.instance
           .reference()
-          .child('room/$roomCode')
+          .child('room/$roomCode/credentials')
           .set(roomData);
 
       roomData['roomCode'] = roomCode;
@@ -38,6 +41,13 @@ class FirebaseService {
   static Future<DataSnapshot> getInfoFromRoomCode(String code) async {
     /// get all info from room with given code
     return FirebaseDatabase.instance.reference().child('room/$code').once();
+  }
+
+  static Future<DataSnapshot> getRoomCodeCredentials(String code) async {
+    return FirebaseDatabase.instance
+        .reference()
+        .child('room/$code/credentials')
+        .once();
   }
 
   static Future<Map> isRoomAndNotExpired(String code) async {
@@ -67,7 +77,7 @@ class FirebaseService {
     return await FirebaseDatabase.instance
         .reference()
         .child('room')
-        .orderByChild('owner')
+        .orderByChild('credentials/owner')
         .equalTo(user)
         .limitToFirst(1)
         .once();
@@ -137,5 +147,20 @@ class FirebaseService {
 
     return String.fromCharCodes(Iterable.generate(
         4, (_) => _chars.codeUnitAt(_rnd.nextInt(_chars.length))));
+  }
+
+  static Future<DataSnapshot> getQueueInfo(String code) async {
+    return await FirebaseDatabase.instance
+        .reference()
+        .child('room/$code/queue')
+        .once();
+  }
+
+  static Future<void> saveNewQueue(
+      String code, Queue newQueue, int creationDate) async {
+    await FirebaseDatabase.instance
+        .reference()
+        .child('room/$code/queue')
+        .set({'lastUpdate': creationDate, 'tracks': newQueue.toList()});
   }
 }

@@ -21,4 +21,17 @@ class Track {
         imageUrl: json['album']['images'][1]['url'] as String,
         artists: artists);
   }
+
+  factory Track.fromSnapshot(Map<dynamic, dynamic> snapshot) {
+    return Track(
+        uri: snapshot['uri'],
+        name: snapshot['name'],
+        // take album image with second best resolution
+        imageUrl: snapshot['imageUrl'],
+        artists: snapshot['artists']);
+  }
+
+  Map<String, dynamic> toMap() {
+    return {'uri': uri, 'name': name, 'imageUrl': imageUrl, 'artists': artists};
+  }
 }
