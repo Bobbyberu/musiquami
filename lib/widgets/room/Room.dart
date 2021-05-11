@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:collection';
 import 'dart:ui';
 
 import 'package:another_flushbar/flushbar.dart';
@@ -24,6 +25,7 @@ class Room extends StatefulWidget {
   _RoomState createState() => _RoomState(code);
 }
 
+// TODO ajouter bouton file d'attente
 class _RoomState extends State<Room> {
   final String code;
   SpotifyService spotify;
@@ -33,6 +35,7 @@ class _RoomState extends State<Room> {
   var _searchController = TextEditingController();
   static StreamSubscription<Event> credentialsChangedListener;
   Future tracks;
+  List<Track> tracksQueue;
 
   final error401 =
       "Il y a eu problème avec la connexion à Spotify. Essaye de recharger la salle";
@@ -65,24 +68,28 @@ class _RoomState extends State<Room> {
   void initRoom() async {
     // get info from room
     // init spotify api
-    await FirebaseService.getInfoFromRoomCode(code).then((snapshot) async {
-      Map<dynamic, dynamic> credentials = snapshot.value['credentials'];
-      setState(() {
-        spotify = SpotifyService(credentials['accessToken'],
-            credentials['refreshToken'], credentials['expiration'], code);
-      });
-      if (spotify.isTokenExpired()) {
-        await spotify.refreshCredentials();
-      }
+    Map<dynamic, dynamic> credentials =
+        await FirebaseService.getRoomCodeCredentials(code)
+            .then((snapshot) => snapshot.value);
+    setState(() {
+      spotify = SpotifyService(credentials['accessToken'],
+          credentials['refreshToken'], credentials['expiration'], code);
     });
+    if (spotify.isTokenExpired()) {
+      await spotify.refreshCredentials();
+    }
   }
 
   void initCredentialsChangedListener() {
     credentialsChangedListener =
         FirebaseService.getCredentialsChangedListener(code, (event) {
-      setState(() {
-        spotify.updateCredentials(event.snapshot.value);
-      });
+      // TODO faire un noeud 'tokens' dans noeud 'credentials' pour éviter cette condition foireuse
+      // update only if node updated is 'credentials' node
+      if (event.snapshot.value.containsKey('owner')) {
+        setState(() {
+          spotify.updateCredentials(event.snapshot.value);
+        });
+      }
     });
   }
 
@@ -140,7 +147,12 @@ class _RoomState extends State<Room> {
                       ]),
                     ],
                   ),
-                ))));
+                ),
+                bottomSheet: GestureDetector(
+                    child: Container(
+                  width: double.infinity,
+                  child: Text('File d\'attente'),
+                )))));
   }
 
   @override
@@ -154,11 +166,18 @@ class _RoomState extends State<Room> {
     var dialog = ConfirmationDialog(track, () {
       context.loaderOverlay.show();
       // ignore: return_of_invalid_type_from_catch_error
-      spotify.queue(track.uri).then((value) {
+      spotify.queue(track.uri).then((value) async {
         context.loaderOverlay.hide();
+        // update tracks queue
+        final newTracksQueue = await spotify.updateQueue(track);
+        setState(() {
+          tracksQueue = newTracksQueue;
+        });
+
         _displaySnackbar('Le titre a été ajouté à la file d\'attente !', false,
             FlushbarPosition.BOTTOM);
       }).catchError((error) {
+        print('error: $error');
         context.loaderOverlay.hide();
         // room owner has no music playing on any of his spotify devices
         if (error.response.statusCode == 404 &&
