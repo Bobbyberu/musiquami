@@ -87,7 +87,6 @@ class SpotifyService {
     return Uri.https('accounts.spotify.com', '/authorize', params).toString();
   }
 
-  // TODO pas static : faire avec token en tant qu'attribut lorsque service instancié
   static Future<Map<String, String>> getUserInfo(String accessToken) async {
     /// Get user id and product value ('premium' or 'open')
     final response = await Dio().get('https://api.spotify.com/v1/me',
