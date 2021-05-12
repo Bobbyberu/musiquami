@@ -36,6 +36,7 @@ class SpotifyAuth extends StatelessWidget {
         },
         onWebViewCreated: (controller) {
           // TODO ajouter un bouton 'se souvenir de moi' qui conditionne les lignes du dessous
+          //ou laisser utilisateur s'authentifier à chaque fois?
           //controller.clearCache();
           //CookieManager().clearCookies();
         });

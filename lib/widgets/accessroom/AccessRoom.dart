@@ -101,14 +101,23 @@ class _AccessRoomState extends State<AccessRoom> {
 
   void _submit(String code) async {
     context.loaderOverlay.show();
-    if (await FirebaseService.isRoom(code)) {
+    Map roomAvailable = await FirebaseService.isRoomAndNotExpired(code);
+    if (roomAvailable['exists'] && !roomAvailable['isExpired']) {
       Navigator.of(context).push(
           new MaterialPageRoute(builder: (context) => new Room(code: code)));
     } else {
+      String errorMessage;
+      if (roomAvailable['isExpired']) {
+        FirebaseService.deleteRoom(code);
+        errorMessage =
+            'Cette salle n\' est plus joignable car elle est expirée !';
+      } else {
+        errorMessage = 'Je n\'ai trouvé aucune salle avec ce code !';
+      }
       showDialog(
           context: context,
           builder: (BuildContext context) {
-            return RoomNotFoundDialog();
+            return RoomNotFoundDialog(errorMessage);
           });
     }
     context.loaderOverlay.hide();

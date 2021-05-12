@@ -5,11 +5,8 @@ import 'dart:math';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:musiquamiapp/services/SpotifyService.dart';
 
-// TODO réorganiser tout ça
-// moins de méthodes statiques
-// documenter les méthodes
-
 class FirebaseService {
+  /// create or update room using spotify user credentials
   static Future<Map> createRoom(Map<dynamic, dynamic> credentials) async {
     final userInfo =
         await SpotifyService.getUserInfo(credentials['access_token']);
@@ -20,10 +17,13 @@ class FirebaseService {
           .then((snapshot) => snapshot.value)
           .catchError((err) => print('error: $err'));
       var roomData = _buildRoomData(credentials, userInfo['id']);
-      // if user has already created room get code
+
+      // if user has room non expired get code
       // else generate new code
-      final roomCode =
-          room != null ? room.entries.first.key : _generateRoomCode();
+      final roomCode = _shouldGenerateRoomCode(room)
+          ? _generateRoomCode()
+          : room.entries.first.key;
+
       await FirebaseDatabase.instance
           .reference()
           .child('room/$roomCode')
@@ -31,6 +31,86 @@ class FirebaseService {
 
       roomData['roomCode'] = roomCode;
       return roomData;
+    }
+  }
+
+  static Future<DataSnapshot> getInfoFromRoomCode(String code) async {
+    /// get all info from room with given code
+    return FirebaseDatabase.instance.reference().child('room/$code').once();
+  }
+
+  static Future<Map> isRoomAndNotExpired(String code) async {
+    /// return Map with 2 bool
+    /// exists: true if room exists
+    /// isExpired : true if room expiration is before now
+    return FirebaseDatabase.instance
+        .reference()
+        .child('room/$code')
+        .once()
+        .then((snapshot) {
+      if (snapshot.value == null) {
+        return {'exists': false, 'isExpired': false};
+      } else {
+        return {
+          'exists': true,
+          'isExpired': DateTime.fromMillisecondsSinceEpoch(
+                  snapshot.value['roomExpiration'])
+              .isBefore(DateTime.now())
+        };
+      }
+    });
+  }
+
+  static Future<DataSnapshot> getRoomFromUser(String user) async {
+    /// get first room with given user as owner
+    return await FirebaseDatabase.instance
+        .reference()
+        .child('room')
+        .orderByChild('owner')
+        .equalTo(user)
+        .limitToFirst(1)
+        .once();
+  }
+
+  static StreamSubscription<Event> getCredentialsChangedListener(
+      String code, Function(Event) callback) {
+    /// get Firebase listener for given room
+    /// code: the code for the room
+    /// callback: the function to call a new event occur on this room
+
+    // avoid duplicating listener at room start
+    return FirebaseDatabase.instance
+        .reference()
+        .child('room/$code')
+        .onChildChanged
+        .listen(callback);
+  }
+
+  static void saveCredentials(SpotifyService spotify, String roomCode) async {
+    /// save new credentials for given room in database
+    final updates = {
+      '/accessToken': spotify.accessToken,
+      '/expiration': spotify.expiration.millisecondsSinceEpoch
+    };
+    await FirebaseDatabase.instance
+        .reference()
+        .child('room/$roomCode/credentials')
+        .update(updates);
+  }
+
+  static void deleteRoom(String code) async {
+    /// delete room with given code
+    await FirebaseDatabase.instance.reference().child('room/$code').set(null);
+  }
+
+  static bool _shouldGenerateRoomCode(dynamic room) {
+    if (room == null) {
+      return true;
+    } else {
+      deleteRoom(room.entries.first.key);
+      return DateTime.fromMillisecondsSinceEpoch(
+              room.entries.first.value['roomExpiration'])
+          .isBefore(DateTime.now());
     }
   }
 
@@ -50,60 +130,11 @@ class FirebaseService {
     };
   }
 
-  static Future<DataSnapshot> getInfoFromRoomCode(String code) async {
-    return FirebaseDatabase.instance.reference().child('room/$code').once();
-  }
-
-// return True if room exists
-// TODO renvoyer false si la salle est expirée
-  static Future<bool> isRoom(String code) async {
-    return FirebaseDatabase.instance
-        .reference()
-        .child('room/$code')
-        .once()
-        .then((snapshot) => snapshot.value != null);
-  }
-
-  static Future<DataSnapshot> getRoomFromUser(String user) async {
-    return await FirebaseDatabase.instance
-        .reference()
-        .child('room')
-        .orderByChild('owner')
-        .equalTo(user)
-        .limitToFirst(1)
-        .once();
-  }
-
-  static StreamSubscription<Event> getCredentialsChangedListener(
-      String code, Function(Event) callback) {
-    // avoid duplicating listener at room start
-    return FirebaseDatabase.instance
-        .reference()
-        .child('room/$code')
-        .onChildChanged
-        .listen(callback);
-  }
-
-  static void saveCredentials(SpotifyService spotify, String roomCode) async {
-    final updates = {
-      '/accessToken': spotify.accessToken,
-      '/expiration': spotify.expiration.millisecondsSinceEpoch
-    };
-    await FirebaseDatabase.instance
-        .reference()
-        .child('room/$roomCode/credentials')
-        .update(updates);
-  }
-
   static String _generateRoomCode() {
     const _chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     Random _rnd = Random();
 
     return String.fromCharCodes(Iterable.generate(
         4, (_) => _chars.codeUnitAt(_rnd.nextInt(_chars.length))));
-  }
-
-  static void deleteRoom(String code) async {
-    await FirebaseDatabase.instance.reference().child('room/$code').set(null);
   }
 }

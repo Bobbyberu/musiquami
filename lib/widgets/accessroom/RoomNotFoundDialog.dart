@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 
 class RoomNotFoundDialog extends StatelessWidget {
+  final String message;
+
+  RoomNotFoundDialog(this.message);
+
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
@@ -16,7 +20,7 @@ class RoomNotFoundDialog extends StatelessWidget {
           child: ListBody(
             children: <Widget>[
               Text(
-                'Je n\'ai trouvé aucune salle avec ce code !',
+                message,
                 style: Theme.of(context).textTheme.bodyText1,
               ),
             ],
