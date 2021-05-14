@@ -5,6 +5,7 @@ import 'dart:math';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:musiquamiapp/services/SpotifyService.dart';
 
+// TODO gérer code dupliqués
 class FirebaseService {
   /// create or update room using spotify user credentials
   static Future<Map> createRoom(Map<dynamic, dynamic> credentials) async {

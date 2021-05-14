@@ -24,6 +24,7 @@ class Room extends StatefulWidget {
   _RoomState createState() => _RoomState(code);
 }
 
+// TODO gérer appels si salle expirée
 class _RoomState extends State<Room> {
   final String code;
   SpotifyService spotify;

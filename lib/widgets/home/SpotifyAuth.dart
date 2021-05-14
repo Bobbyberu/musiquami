@@ -5,6 +5,7 @@ import 'package:musiquamiapp/widgets/roomsas/RoomSas.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
+// TODO cacher clavier après avoir saisi combo login/mot de passe
 class SpotifyAuth extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
