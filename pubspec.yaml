@@ -12,7 +12,7 @@ dependencies:
   flutter:
     sdk: flutter
   webview_flutter: ^2.0.4
-  firebase_core: ^1.0.3
+  firebase_core: ^1.1.1
   firebase_database: ^6.1.2
   page_transition: ^1.1.7+6
 
