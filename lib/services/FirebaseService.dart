@@ -43,10 +43,10 @@ class FirebaseService {
     return FirebaseDatabase.instance.reference().child('room/$code').once();
   }
 
-  static Future<DataSnapshot> getRoomTokens(String code) async {
+  static Future<DataSnapshot> getRoom(String code) async {
     return FirebaseDatabase.instance
         .reference()
-        .child('room/$code/credentials/tokens')
+        .child('room/$code/credentials')
         .once();
   }
 

@@ -54,67 +54,71 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        body: Center(
-            child: connectivityResult == ConnectivityResult.none
-                ? Offline()
-                : Stack(children: [
-                    BlurredLogo(),
-                    Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          Padding(
-                            padding: EdgeInsets.only(left: 30, right: 30),
-                            child: Text(
-                              'Mettez votre propre musique chez vos amis dès maintenant avec Musiquami.',
-                              style: Theme.of(context).textTheme.headline1,
-                            ),
-                          ),
-                          Padding(
-                              padding: EdgeInsets.only(left: 20, right: 20),
-                              child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: <Widget>[
-                                    Padding(
-                                        padding: EdgeInsets.only(bottom: 20),
-                                        child: ElevatedButton(
-                                            onPressed: () => Navigator.push(
-                                                context,
-                                                PageTransition(
-                                                    child: SpotifyAuth(),
-                                                    type: PageTransitionType
-                                                        .rightToLeft)),
-                                            child: Text(
-                                              'Créer une salle',
-                                              style: TextStyle(
-                                                  fontSize: 22,
-                                                  color:
-                                                      CustomColors.sakuraCream),
-                                            ),
-                                            style: Theme.of(context)
-                                                .elevatedButtonTheme
-                                                .style)),
-                                    Padding(
-                                        padding: EdgeInsets.only(top: 20),
-                                        child: ElevatedButton(
-                                            onPressed: () => Navigator.push(
-                                                context,
-                                                PageTransition(
-                                                    child: AccessRoom(),
-                                                    type: PageTransitionType
-                                                        .rightToLeft)),
-                                            child: Text(
-                                              'Rejoindre une salle',
-                                              style: TextStyle(
-                                                  fontSize: 22,
-                                                  color:
-                                                      CustomColors.sakuraCream),
-                                            ),
-                                            style: Theme.of(context)
-                                                .elevatedButtonTheme
-                                                .style))
-                                  ]))
-                        ])
-                  ])));
+    return WillPopScope(
+        onWillPop: () async => false,
+        child: Scaffold(
+            body: Center(
+                child: connectivityResult == ConnectivityResult.none
+                    ? Offline()
+                    : Stack(children: [
+                        BlurredLogo(),
+                        Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              Padding(
+                                padding: EdgeInsets.only(left: 30, right: 30),
+                                child: Text(
+                                  'Mettez votre propre musique chez vos amis dès maintenant avec Musiquami.',
+                                  style: Theme.of(context).textTheme.headline1,
+                                ),
+                              ),
+                              Padding(
+                                  padding: EdgeInsets.only(left: 20, right: 20),
+                                  child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: <Widget>[
+                                        Padding(
+                                            padding:
+                                                EdgeInsets.only(bottom: 20),
+                                            child: ElevatedButton(
+                                                onPressed: () => Navigator.push(
+                                                    context,
+                                                    PageTransition(
+                                                        child: SpotifyAuth(),
+                                                        type: PageTransitionType
+                                                            .rightToLeft)),
+                                                child: Text(
+                                                  'Créer une salle',
+                                                  style: TextStyle(
+                                                      fontSize: 22,
+                                                      color: CustomColors
+                                                          .sakuraCream),
+                                                ),
+                                                style: Theme.of(context)
+                                                    .elevatedButtonTheme
+                                                    .style)),
+                                        Padding(
+                                            padding: EdgeInsets.only(top: 20),
+                                            child: ElevatedButton(
+                                                onPressed: () => Navigator.push(
+                                                    context,
+                                                    PageTransition(
+                                                        child: AccessRoom(),
+                                                        type: PageTransitionType
+                                                            .rightToLeft)),
+                                                child: Text(
+                                                  'Rejoindre une salle',
+                                                  style: TextStyle(
+                                                      fontSize: 22,
+                                                      color: CustomColors
+                                                          .sakuraCream),
+                                                ),
+                                                style: Theme.of(context)
+                                                    .elevatedButtonTheme
+                                                    .style))
+                                      ]))
+                            ])
+                      ]))));
   }
 }
