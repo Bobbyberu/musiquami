@@ -13,8 +13,6 @@ class AccessRoom extends StatefulWidget {
   _AccessRoomState createState() => _AccessRoomState();
 }
 
-// TODO auto focus clavier en arrivant sur la page
-// TODO effacer saisie si expirée/inexistant
 class _AccessRoomState extends State<AccessRoom> {
   String code;
   bool buttonDisabled = true;
@@ -61,6 +59,7 @@ class _AccessRoomState extends State<AccessRoom> {
                             padding: EdgeInsets.only(
                                 left: 20, right: 20, bottom: 30),
                             child: TextFormField(
+                              autofocus: true,
                               style: Theme.of(context)
                                   .textTheme
                                   .headline2
@@ -121,6 +120,8 @@ class _AccessRoomState extends State<AccessRoom> {
           builder: (BuildContext context) {
             return RoomNotFoundDialog(errorMessage);
           });
+
+      _controller.clear();
     }
     context.loaderOverlay.hide();
   }

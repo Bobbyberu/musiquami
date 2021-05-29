@@ -38,7 +38,7 @@ class SpotifyService {
       'client_secret': secrets.clientSecret,
       'grant_type': 'authorization_code',
       'code': code,
-      'redirect_uri': 'http://192.168.0.29:3000/'
+      'redirect_uri': 'http://url/'
     };
     final url = 'https://accounts.spotify.com/api/token';
 
@@ -85,7 +85,7 @@ class SpotifyService {
     final params = {
       'client_id': _clientId,
       'response_type': 'code',
-      'redirect_uri': 'http://192.168.0.29:3000/',
+      'redirect_uri': 'http://url/',
       'scope':
           'user-modify-playback-state user-read-private user-read-currently-playing user-read-recently-played',
       'show_dialog': 'true'

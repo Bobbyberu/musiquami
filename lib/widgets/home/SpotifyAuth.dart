@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:musiquamiapp/services/SpotifyService.dart';
 import 'package:musiquamiapp/widgets/home/CannotCreateRoom.dart';
 import 'package:musiquamiapp/widgets/roomsas/RoomSas.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
-// TODO cacher clavier après avoir saisi combo login/mot de passe
 class SpotifyAuth extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -13,8 +13,9 @@ class SpotifyAuth extends StatelessWidget {
         javascriptMode: JavascriptMode.unrestricted,
         initialUrl: SpotifyService.getAuthorizeUrl(),
         navigationDelegate: (navReq) async {
-          // TODO changer url pour url bidon
-          if (navReq.url.startsWith('http://192.168.0.29:3000/')) {
+          // hide keyboard on new web page
+          SystemChannels.textInput.invokeMethod('TextInput.hide');
+          if (navReq.url.startsWith('http://url/')) {
             final SpotifyService credentials =
                 await SpotifyService.getCredentialsFromCode(
                     Uri.dataFromString(navReq.url).queryParameters['code']);
