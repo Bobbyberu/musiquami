@@ -184,7 +184,7 @@ class _RoomState extends State<Room> {
                               enableSuggestions: false,
                               style: Theme.of(context).textTheme.headline2,
                               decoration: InputDecoration(
-                                  hintText: "Rechercher",
+                                  hintText: "Mets-nous un truc sympa",
                                   hintStyle:
                                       TextStyle(fontStyle: FontStyle.italic),
                                   fillColor: CustomColors.sakuraLight.shade100,

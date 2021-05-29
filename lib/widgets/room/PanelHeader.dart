@@ -20,11 +20,13 @@ class PanelHeader extends StatelessWidget {
                       .textTheme
                       .bodyText1
                       .copyWith(fontSize: 20)),
-              Icon(
-                Icons.keyboard_arrow_up,
-                color: Theme.of(context).accentColor,
-                size: 50,
-              )
+              Padding(
+                  padding: EdgeInsets.only(right: 10),
+                  child: Icon(
+                    Icons.keyboard_arrow_up,
+                    color: Theme.of(context).accentColor,
+                    size: 50,
+                  ))
             ]));
   }
 }
