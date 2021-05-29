@@ -25,7 +25,7 @@ class FirebaseService {
       // if user has room non expired get code
       // else generate new code
       final roomCode = _shouldGenerateRoomCode(room)
-          ? _generateRoomCode()
+          ? await _generateRoomCode()
           : room.entries.first.key;
 
       await FirebaseDatabase.instance
@@ -143,12 +143,30 @@ class FirebaseService {
     };
   }
 
-  static String _generateRoomCode() {
+  static Future<String> _generateRoomCode() async {
+    /// Generate valid code for future room
     const _chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     Random _rnd = Random();
 
-    return String.fromCharCodes(Iterable.generate(
-        4, (_) => _chars.codeUnitAt(_rnd.nextInt(_chars.length))));
+    // avoid duplicate room code
+    bool roomCodeValid = false;
+    String code;
+    while (!roomCodeValid) {
+      code = String.fromCharCodes(Iterable.generate(
+          4, (_) => _chars.codeUnitAt(_rnd.nextInt(_chars.length))));
+      roomCodeValid = await _roomCodeIsValid(code);
+    }
+
+    return code;
+  }
+
+  static Future<bool> _roomCodeIsValid(String code) async {
+    /// return true if no room with given code has been found in db
+    return await FirebaseDatabase.instance
+        .reference()
+        .child('room/$code')
+        .once()
+        .then((snapshot) => snapshot.value == null);
   }
 
   static Future<DataSnapshot> getQueueInfo(String code) async {
