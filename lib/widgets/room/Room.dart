@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:collection';
 import 'dart:ui';
 
 import 'package:another_flushbar/flushbar.dart';
@@ -12,9 +11,12 @@ import 'package:musiquamiapp/services/FirebaseService.dart';
 import 'package:musiquamiapp/services/LocalStorageService.dart';
 import 'package:musiquamiapp/services/SpotifyService.dart';
 import 'package:musiquamiapp/utils/CustomColors.dart';
+import 'package:musiquamiapp/widgets/room/PanelHeader.dart';
+import 'package:musiquamiapp/widgets/room/PanelQueue.dart';
 import 'package:musiquamiapp/widgets/room/ConfirmationDialog.dart';
 import 'package:musiquamiapp/widgets/room/RoomPresentation.dart';
 import 'package:musiquamiapp/widgets/room/TrackListView.dart';
+import 'package:sliding_up_panel/sliding_up_panel.dart';
 
 class Room extends StatefulWidget {
   final String code;
@@ -26,6 +28,7 @@ class Room extends StatefulWidget {
 }
 
 // TODO gérer appels si salle expirée
+// TODO status bar transparente/floue
 class _RoomState extends State<Room> {
   final String code;
   SpotifyService spotify;
@@ -33,6 +36,7 @@ class _RoomState extends State<Room> {
   bool isRoomOwned = false;
   String previousStringValue;
   var _searchController = TextEditingController();
+  bool isPanelDraggable = true;
   static StreamSubscription<Event> credentialsChangedListener;
   Future tracks;
   List<Track> tracksQueue;
@@ -49,8 +53,9 @@ class _RoomState extends State<Room> {
   void initState() {
     super.initState();
     initRoom();
-    initCredentialsChangedListener();
+    initDatabaseChildChangedListener();
     initRoomOwned();
+    initQueue();
     _searchController.addListener(() {
       // do not call future builder refresh on keyboard dismiss/appear
       if (previousStringValue != _searchController.text) {
@@ -68,27 +73,27 @@ class _RoomState extends State<Room> {
   void initRoom() async {
     // get info from room
     // init spotify api
-    Map<dynamic, dynamic> credentials =
-        await FirebaseService.getRoomCodeCredentials(code)
-            .then((snapshot) => snapshot.value);
+    Map<dynamic, dynamic> tokens = await FirebaseService.getRoomTokens(code)
+        .then((snapshot) => snapshot.value);
     setState(() {
-      spotify = SpotifyService(credentials['accessToken'],
-          credentials['refreshToken'], credentials['expiration'], code);
+      spotify = SpotifyService(tokens['accessToken'], tokens['refreshToken'],
+          tokens['expiration'], code);
     });
     if (spotify.isTokenExpired()) {
       await spotify.refreshCredentials();
     }
   }
 
-  void initCredentialsChangedListener() {
+  void initDatabaseChildChangedListener() {
     credentialsChangedListener =
         FirebaseService.getCredentialsChangedListener(code, (event) {
-      // TODO faire un noeud 'tokens' dans noeud 'credentials' pour éviter cette condition foireuse
       // update only if node updated is 'credentials' node
       if (event.snapshot.value.containsKey('owner')) {
         setState(() {
           spotify.updateCredentials(event.snapshot.value);
         });
+      } else if (event.snapshot.value.containsKey('tracks')) {
+        _updateQueue(event.snapshot.value);
       }
     });
   }
@@ -100,6 +105,22 @@ class _RoomState extends State<Room> {
     });
   }
 
+  void initQueue() async {
+    await FirebaseService.getQueueInfo(code).then((snapshot) {
+      _updateQueue(snapshot.value);
+    });
+  }
+
+  void _updateQueue(dynamic snapshotValue) {
+    List<dynamic> queue =
+        snapshotValue != null ? snapshotValue['tracks'] : List<Track>.empty();
+    setState(() {
+      tracksQueue = queue.isEmpty
+          ? queue
+          : queue.map((e) => Track.fromSnapshot(e)).toList();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Theme(
@@ -107,13 +128,41 @@ class _RoomState extends State<Room> {
         child: LoaderOverlay(
             child: Scaffold(
                 resizeToAvoidBottomInset: false,
-                body: SafeArea(
-                  child: Stack(
-                    children: [
+                body: SlidingUpPanel(
+                    isDraggable: isPanelDraggable,
+                    backdropEnabled: true,
+                    backdropTapClosesPanel: false,
+                    parallaxEnabled: true,
+                    parallaxOffset: 0.15,
+                    padding: EdgeInsets.only(top: 0, left: 10),
+                    minHeight: 65,
+                    // sliding up panel height is 90% of device screen
+                    maxHeight: MediaQuery.of(context).size.height * 0.90,
+                    color: Theme.of(context).bottomAppBarColor,
+                    panelBuilder: (ScrollController sc) => PanelQueue(
+                        queue: tracksQueue,
+                        sc: sc,
+                        refresh:
+                            (AnimationController animationController) async {
+                          animationController.forward();
+                          final newTracksQueue = await spotify.updateQueue();
+                          setState(() {
+                            tracksQueue = newTracksQueue;
+                          });
+                          animationController.reset();
+                        }),
+                    header: PanelHeader(
+                        tracksQueue != null ? tracksQueue.length : 0),
+                    body: SafeArea(
+                        child: Stack(children: [
                       if (showTracks)
                         TrackListView(tracks, _showConfirmationDialog)
                       else
-                        RoomPresentation(code, isRoomOwned),
+                        GestureDetector(
+                            child: RoomPresentation(code, isRoomOwned),
+                            // make all gesture detector tappable, not just text and buttons
+                            behavior: HitTestBehavior.translucent,
+                            onTap: () => FocusScope.of(context).unfocus()),
                       Stack(children: [
                         // searchbar background is blurred
                         ClipRect(
@@ -132,6 +181,9 @@ class _RoomState extends State<Room> {
                               enableSuggestions: false,
                               style: Theme.of(context).textTheme.headline2,
                               decoration: InputDecoration(
+                                  hintText: "Rechercher",
+                                  hintStyle:
+                                      TextStyle(fontStyle: FontStyle.italic),
                                   fillColor: CustomColors.sakuraLight.shade100,
                                   prefixIcon: Icon(Icons.search),
                                   suffixIcon: _searchController.text != ''
@@ -143,16 +195,9 @@ class _RoomState extends State<Room> {
                                         )
                                       : null),
                               controller: _searchController,
-                            )),
-                      ]),
-                    ],
-                  ),
-                ),
-                bottomSheet: GestureDetector(
-                    child: Container(
-                  width: double.infinity,
-                  child: Text('File d\'attente'),
-                )))));
+                            ))
+                      ])
+                    ]))))));
   }
 
   @override
@@ -203,17 +248,17 @@ class _RoomState extends State<Room> {
     Flushbar(
         message: message,
         messageColor: CustomColors.sakuraCream,
-        duration: Duration(seconds: 7),
+        duration: Duration(seconds: isError ? 7 : 3),
         flushbarPosition: flushbarPosition,
         margin: EdgeInsets.all(8),
         borderRadius: BorderRadius.circular(8),
         icon: Icon(
           isError ? Icons.error : Icons.check_circle,
           size: 28.0,
-          color: CustomColors.sakuraLighter,
+          color: CustomColors.sakuraLight2,
         ),
         backgroundColor: CustomColors.darkGrey,
-        leftBarIndicatorColor: CustomColors.sakuraLighter,
+        leftBarIndicatorColor: CustomColors.sakuraLight2,
         forwardAnimationCurve: Curves.decelerate,
         reverseAnimationCurve: Curves.decelerate)
       ..show(context);

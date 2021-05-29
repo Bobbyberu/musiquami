@@ -22,6 +22,13 @@ class SpotifyService {
     this.roomCode = roomCode;
   }
 
+  SpotifyService.fromMap(Map<dynamic, dynamic> tokens) {
+    this.accessToken = tokens['accessToken'];
+    this.refreshToken = tokens['refreshToken'];
+    this.expiration = DateTime.fromMillisecondsSinceEpoch(tokens['expiration']);
+    this.roomCode = tokens['roomCode'];
+  }
+
   static Future<SpotifyService> getCredentialsFromCode(String code) async {
     /// Allow to get tokens from Spotify using code returned during auth
     var secrets = await SecretService.getApiKeys();
@@ -41,11 +48,7 @@ class SpotifyService {
 
     final credentials = await FirebaseService.createRoom(response.data);
     if (credentials != null) {
-      return SpotifyService(
-          credentials['accessToken'],
-          credentials['refreshToken'],
-          credentials['expiration'],
-          credentials['roomCode']);
+      return SpotifyService.fromMap(credentials['tokens']);
     } else {
       return null;
     }
@@ -83,7 +86,9 @@ class SpotifyService {
       'client_id': _clientId,
       'response_type': 'code',
       'redirect_uri': 'http://192.168.0.29:3000/',
-      'scope': 'user-modify-playback-state user-read-private'
+      'scope':
+          'user-modify-playback-state user-read-private user-read-currently-playing user-read-recently-played',
+      'show_dialog': 'true'
     };
     return Uri.https('accounts.spotify.com', '/authorize', params).toString();
   }
@@ -136,30 +141,70 @@ class SpotifyService {
         _buildUrl('me/player/recently-played', params), 'get');
   }
 
-  Future<List> updateQueue(Track track) async {
+  Future<Response> getCurrentlyPlayingTrack() async {
+    final params = {'market': 'from_token'};
+    return await _requestApi(
+        _buildUrl('me/player/currently-playing', params), 'get');
+  }
+
+  Future<List> updateQueue([Track track]) async {
     final queueInfo = await FirebaseService.getQueueInfo(roomCode)
         .then((snapshot) => snapshot.value);
+    // get id of track currenty playing
+    final uriTrackCurrentlyPlaying = await getCurrentlyPlayingTrack()
+        .then((response) => response.data['item']['uri']);
 
     Queue tracksQueue;
-    if (queueInfo != null) {
-      tracksQueue = Queue.from(queueInfo['tracks']);
+    // track playing not in queue -> queue is up to date
+    // or has been completely consumed
+    if (queueInfo != null && queueInfo['tracks'] != null) {
       // get previously played track since last database's queue update
-      final recentlyPlayedTracksLength =
+      final recentlyLength =
           await getRecentlyPlayedTracks(queueInfo['lastUpdate'])
               .then((response) => response.data['items'].length);
-      // removing all tracks that has been played in database's queue
-      print('recently played: $recentlyPlayedTracksLength');
-      for (var i = 1; i <= recentlyPlayedTracksLength; i++) {
-        tracksQueue.removeFirst();
+      tracksQueue = Queue.from(queueInfo['tracks']);
+      if (tracksQueue.firstWhere(
+              (element) => element['uri'] == uriTrackCurrentlyPlaying,
+              orElse: () => null) !=
+          null) {
+        // removing all tracks that has been played in database's queue
+        for (var i = 1;
+            _shoudlContinueRemovingFromQueue(
+                i, recentlyLength, uriTrackCurrentlyPlaying, tracksQueue);
+            i++) {
+          tracksQueue.removeFirst();
+        }
+
+        // removing song currently playing from queue
+        if (tracksQueue.first['uri'] == uriTrackCurrentlyPlaying) {
+          tracksQueue.removeFirst();
+        }
+      } else if (recentlyLength > 0) {
+        // queue has been completely consumed
+        tracksQueue = Queue();
       }
     } else {
       tracksQueue = Queue();
     }
-    tracksQueue.add(track.toMap());
+
+    if (track != null) {
+      tracksQueue.add(track.toMap());
+    }
+
     await FirebaseService.saveNewQueue(
         roomCode, tracksQueue, DateTime.now().millisecondsSinceEpoch);
 
-    // returning Queue<Track> instead of Queue<Map>
+    // returning List<Track> instead of List<Map>
     return tracksQueue.map((e) => Track.fromSnapshot(e)).toList();
+  }
+
+  bool _shoudlContinueRemovingFromQueue(
+      int i, int recentlyLength, String uriTrackCurrentlyPlaying, Queue queue) {
+    /// Return true if all tracks from queue until the one currently playing have been removed
+    /// i: the index of loop
+    /// recentlyLength: the length of recently played tracks
+    /// uriTrackCurrentlyPlaying
+    /// queue: the tracks queue currently stored in database
+    return i < recentlyLength || queue.first['uri'] != uriTrackCurrentlyPlaying;
   }
 }

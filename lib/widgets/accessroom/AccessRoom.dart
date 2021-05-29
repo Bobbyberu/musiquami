@@ -14,6 +14,7 @@ class AccessRoom extends StatefulWidget {
 }
 
 // TODO auto focus clavier en arrivant sur la page
+// TODO effacer saisie si expirée/inexistant
 class _AccessRoomState extends State<AccessRoom> {
   String code;
   bool buttonDisabled = true;
@@ -91,7 +92,7 @@ class _AccessRoomState extends State<AccessRoom> {
                               child: Text('J\'y vais!',
                                   style: buttonDisabled
                                       ? TextStyle(
-                                          color: CustomColors.sakuraDarker)
+                                          color: CustomColors.sakuraDark2)
                                       : Theme.of(context).textTheme.button),
                               style:
                                   Theme.of(context).elevatedButtonTheme.style),

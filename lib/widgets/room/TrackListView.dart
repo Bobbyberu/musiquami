@@ -29,7 +29,7 @@ class TrackListView extends StatelessWidget {
                         child: Row(
                           children: [
                             SkeletonAnimation(
-                                shimmerColor: CustomColors.sakuraLight,
+                                shimmerColor: CustomColors.sakuraDark,
                                 child: Container(
                                   height: 60,
                                   width: 60,
@@ -50,7 +50,7 @@ class TrackListView extends StatelessWidget {
                                                 EdgeInsets.only(bottom: 10),
                                             child: SkeletonAnimation(
                                                 shimmerColor:
-                                                    CustomColors.sakuraLight,
+                                                    CustomColors.sakuraDark,
                                                 child: Container(
                                                   height: 15,
                                                   width: MediaQuery.of(context)
@@ -66,7 +66,7 @@ class TrackListView extends StatelessWidget {
                                                 ))),
                                         SkeletonAnimation(
                                             shimmerColor:
-                                                CustomColors.sakuraLight,
+                                                CustomColors.sakuraDark,
                                             child: Container(
                                               height: 15,
                                               width: MediaQuery.of(context)
@@ -88,13 +88,17 @@ class TrackListView extends StatelessWidget {
                     ));
           }
           return ListView.separated(
-            padding: EdgeInsets.fromLTRB(10, 100, 10, 10),
-            itemBuilder: (context, i) =>
-                TrackRow(snapshot.data[i] as Track, () {
-              FocusScope.of(context).unfocus();
-              //_showConfirmationDialog(snapshot.data[i]);
-              showConfirmationDialog(snapshot.data[i]);
-            }),
+            padding: EdgeInsets.fromLTRB(10, 100, 10, 75),
+            itemBuilder: (context, i) => GestureDetector(
+                // make all gesture detector tappable, not just text and image
+                behavior: HitTestBehavior.translucent,
+                key: Key(snapshot.data[i].uri),
+                child: TrackRow(snapshot.data[i] as Track),
+                onTap: () {
+                  FocusScope.of(context).unfocus();
+                  //_showConfirmationDialog(snapshot.data[i]);
+                  showConfirmationDialog(snapshot.data[i]);
+                }),
             separatorBuilder: (BuildContext context, int index) =>
                 const Divider(),
             itemCount: snapshot.data.length,

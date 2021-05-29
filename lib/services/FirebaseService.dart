@@ -4,23 +4,23 @@ import 'dart:core';
 import 'dart:math';
 
 import 'package:firebase_database/firebase_database.dart';
-import 'package:musiquamiapp/entities/Track.dart';
 import 'package:musiquamiapp/services/SpotifyService.dart';
 
-// TODO gérer code dupliqués
+// TODO gérer code de salle dupliqués
 class FirebaseService {
-  /// create or update room using spotify user credentials
   static Future<Map> createRoom(Map<dynamic, dynamic> credentials) async {
+    /// create or update room using spotify user credentials
     final userInfo =
         await SpotifyService.getUserInfo(credentials['access_token']);
+
+    // allowing room creation only for spotify user premium
     if (userInfo['product'] != 'premium') {
       return null;
     } else {
-      // TODO changer roomData pour roomCredentials
       final room = await getRoomFromUser(userInfo['id'])
           .then((snapshot) => snapshot.value)
           .catchError((err) => print('error: $err'));
-      var roomData = _buildRoomData(credentials, userInfo['id']);
+      var roomCredentials = _buildRoomCredentials(credentials, userInfo['id']);
 
       // if user has room non expired get code
       // else generate new code
@@ -31,10 +31,10 @@ class FirebaseService {
       await FirebaseDatabase.instance
           .reference()
           .child('room/$roomCode/credentials')
-          .set(roomData);
+          .set(roomCredentials);
 
-      roomData['roomCode'] = roomCode;
-      return roomData;
+      roomCredentials['tokens']['roomCode'] = roomCode;
+      return roomCredentials;
     }
   }
 
@@ -43,10 +43,10 @@ class FirebaseService {
     return FirebaseDatabase.instance.reference().child('room/$code').once();
   }
 
-  static Future<DataSnapshot> getRoomCodeCredentials(String code) async {
+  static Future<DataSnapshot> getRoomTokens(String code) async {
     return FirebaseDatabase.instance
         .reference()
-        .child('room/$code/credentials')
+        .child('room/$code/credentials/tokens')
         .once();
   }
 
@@ -65,7 +65,7 @@ class FirebaseService {
         return {
           'exists': true,
           'isExpired': DateTime.fromMillisecondsSinceEpoch(
-                  snapshot.value['roomExpiration'])
+                  snapshot.value['credentials']['roomExpiration'])
               .isBefore(DateTime.now())
         };
       }
@@ -117,22 +117,24 @@ class FirebaseService {
   static bool _shouldGenerateRoomCode(dynamic room) {
     if (room == null) {
       return true;
-    } else {
+    } else if (DateTime.fromMillisecondsSinceEpoch(
+            room.entries.first.value['credentials']['roomExpiration'])
+        .isBefore(DateTime.now())) {
       deleteRoom(room.entries.first.key);
-      return DateTime.fromMillisecondsSinceEpoch(
-              room.entries.first.value['roomExpiration'])
-          .isBefore(DateTime.now());
+      return true;
+    } else {
+      return false;
     }
   }
 
-  static Map<String, dynamic> _buildRoomData(
+  static Map<String, dynamic> _buildRoomCredentials(
       Map<String, dynamic> credentials, String userId) {
     return {
       'owner': userId,
       // room is supposed to expire after 5 hours
       'roomExpiration':
           DateTime.now().add(Duration(hours: 5)).millisecondsSinceEpoch,
-      'credentials': {
+      'tokens': {
         'accessToken': credentials['access_token'],
         'refreshToken': credentials['refresh_token'],
         'expiration':

@@ -13,6 +13,7 @@ class SpotifyAuth extends StatelessWidget {
         javascriptMode: JavascriptMode.unrestricted,
         initialUrl: SpotifyService.getAuthorizeUrl(),
         navigationDelegate: (navReq) async {
+          // TODO changer url pour url bidon
           if (navReq.url.startsWith('http://192.168.0.29:3000/')) {
             final SpotifyService credentials =
                 await SpotifyService.getCredentialsFromCode(

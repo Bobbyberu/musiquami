@@ -29,10 +29,12 @@ class MusiquamiApp extends StatelessWidget {
               backgroundColor: CustomColors.sakuraDark,
               elevation: 0.0),
           accentColor: CustomColors.sakuraCream,
-          disabledColor: CustomColors.sakuraDarker,
+          disabledColor: CustomColors.sakuraDark2,
+          // sliding up panel background color
+          bottomAppBarColor: CustomColors.sakuraDark3,
           inputDecorationTheme: InputDecorationTheme(
               filled: true,
-              fillColor: CustomColors.sakuraDarker,
+              fillColor: CustomColors.sakuraDark2,
               border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(40.0))),
           textTheme: TextTheme(
@@ -51,7 +53,7 @@ class MusiquamiApp extends StatelessWidget {
                 fontWeight: FontWeight.normal),
             // dialog button text
             bodyText2: TextStyle(
-                color: CustomColors.sakuraLighter,
+                color: CustomColors.sakuraLight2,
                 fontSize: 20,
                 fontWeight: FontWeight.w900),
           ),
@@ -66,7 +68,7 @@ class MusiquamiApp extends StatelessWidget {
                 minimumSize:
                     MaterialStateProperty.all(Size(double.infinity, 0)),
                 overlayColor:
-                    MaterialStateProperty.all(CustomColors.sakuraLighter)),
+                    MaterialStateProperty.all(CustomColors.sakuraLight2)),
           ),
           scaffoldBackgroundColor: CustomColors.sakuraDark),
     );
