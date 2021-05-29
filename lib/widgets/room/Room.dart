@@ -27,9 +27,9 @@ class Room extends StatefulWidget {
   _RoomState createState() => _RoomState(code);
 }
 
-// TODO gérer appels si salle expirée
 class _RoomState extends State<Room> {
   final String code;
+  DateTime expiration;
   SpotifyService spotify;
   bool showTracks = false;
   bool isRoomOwned = false;
@@ -72,8 +72,9 @@ class _RoomState extends State<Room> {
   void initRoom() async {
     // get info from room
     // init spotify api
-    Map<dynamic, dynamic> tokens = await FirebaseService.getRoomTokens(code)
-        .then((snapshot) => snapshot.value);
+    Map<dynamic, dynamic> room =
+        await FirebaseService.getRoom(code).then((snapshot) => snapshot.value);
+    final tokens = room['tokens'];
     setState(() {
       spotify = SpotifyService(tokens['accessToken'], tokens['refreshToken'],
           tokens['expiration'], code);
@@ -89,7 +90,9 @@ class _RoomState extends State<Room> {
       // update only if node updated is 'credentials' node
       if (event.snapshot.value.containsKey('owner')) {
         setState(() {
-          spotify.updateCredentials(event.snapshot.value);
+          expiration = DateTime.fromMillisecondsSinceEpoch(
+              event.snapshot.value['roomExpiration']);
+          spotify.updateCredentials(event.snapshot.value['tokens']);
         });
       } else if (event.snapshot.value.containsKey('tracks')) {
         _updateQueue(event.snapshot.value);
@@ -208,32 +211,41 @@ class _RoomState extends State<Room> {
 
   void _showConfirmationDialog(Track track) {
     var dialog = ConfirmationDialog(track, () {
-      context.loaderOverlay.show();
-      // ignore: return_of_invalid_type_from_catch_error
-      spotify.queue(track.uri).then((value) async {
-        context.loaderOverlay.hide();
-        // update tracks queue
-        final newTracksQueue = await spotify.updateQueue(track);
-        setState(() {
-          tracksQueue = newTracksQueue;
-        });
+      if (DateTime.now().isBefore(expiration)) {
+        context.loaderOverlay.show();
+        // ignore: return_of_invalid_type_from_catch_error
+        spotify.queue(track.uri).then((value) async {
+          context.loaderOverlay.hide();
+          // update tracks queue
+          final newTracksQueue = await spotify.updateQueue(track);
+          setState(() {
+            tracksQueue = newTracksQueue;
+          });
 
-        _displaySnackbar('Le titre a été ajouté à la file d\'attente !', false,
+          _displaySnackbar('Le titre a été ajouté à la file d\'attente !',
+              false, FlushbarPosition.BOTTOM);
+        }).catchError((error) {
+          print('error: $error');
+          context.loaderOverlay.hide();
+          // room owner has no music playing on any of his spotify devices
+          if (error.response.statusCode == 404 &&
+              error.response.data['error']['reason'] == 'NO_ACTIVE_DEVICE') {
+            _displaySnackbar(error404Queue, true, FlushbarPosition.BOTTOM);
+          } else {
+            print(error.response.toString());
+            _displaySnackbar('Erreur', true, FlushbarPosition.BOTTOM);
+          }
+        });
+        _searchController.clear();
+        Navigator.of(context).pop();
+      } else {
+        _searchController.clear();
+        Navigator.of(context).pop();
+        _displaySnackbar(
+            'Mise en file d\'attente Impossible ! Cette salle a été supprimée ou a expiré.',
+            true,
             FlushbarPosition.BOTTOM);
-      }).catchError((error) {
-        print('error: $error');
-        context.loaderOverlay.hide();
-        // room owner has no music playing on any of his spotify devices
-        if (error.response.statusCode == 404 &&
-            error.response.data['error']['reason'] == 'NO_ACTIVE_DEVICE') {
-          _displaySnackbar(error404Queue, true, FlushbarPosition.BOTTOM);
-        } else {
-          print(error.response.toString());
-          _displaySnackbar('Erreur', true, FlushbarPosition.BOTTOM);
-        }
-      });
-      _searchController.clear();
-      Navigator.of(context).pop();
+      }
     });
 
     showDialog(
