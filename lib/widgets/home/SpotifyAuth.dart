@@ -10,6 +10,7 @@ class SpotifyAuth extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return WebView(
+        userAgent: "random",
         javascriptMode: JavascriptMode.unrestricted,
         initialUrl: SpotifyService.getAuthorizeUrl(),
         navigationDelegate: (navReq) async {
@@ -38,8 +39,8 @@ class SpotifyAuth extends StatelessWidget {
           }
         },
         onWebViewCreated: (controller) {
-          //controller.clearCache();
-          //CookieManager().clearCookies();
+          controller.clearCache();
+          CookieManager().clearCookies();
         });
   }
 }
