@@ -30,6 +30,7 @@ dependencies:
   skeleton_text: ^3.0.0
   sliding_up_panel: ^2.0.0+1
   progress_indicator_button: ^0.0.3
+  firebase_dynamic_links: ^2.0.5
 
 dev_dependencies:
   flutter_test:

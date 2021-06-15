@@ -3,6 +3,7 @@ import 'dart:ui';
 
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
+import 'package:musiquamiapp/services/DynamicLinks.dart';
 import 'package:musiquamiapp/utils/CustomColors.dart';
 import 'package:musiquamiapp/widgets/accessroom/AccessRoom.dart';
 import 'package:musiquamiapp/widgets/common/BlurredLogo.dart';
@@ -24,6 +25,7 @@ class _HomeState extends State<Home> {
     super.initState();
     initConnectivity();
     initConnectivitySubscription();
+    DynamicLinksService.initDynamicLinks();
   }
 
   void initConnectivity() async {
