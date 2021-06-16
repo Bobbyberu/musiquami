@@ -138,7 +138,7 @@ class _RoomState extends State<Room> {
                     parallaxEnabled: true,
                     parallaxOffset: 0.15,
                     padding: EdgeInsets.only(top: 0, left: 10),
-                    minHeight: 65,
+                    minHeight: 80,
                     // sliding up panel height is 90% of device screen
                     maxHeight: MediaQuery.of(context).size.height * 0.90,
                     color: Theme.of(context).bottomAppBarColor,

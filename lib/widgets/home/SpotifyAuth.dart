@@ -39,8 +39,9 @@ class SpotifyAuth extends StatelessWidget {
           }
         },
         onWebViewCreated: (controller) {
-          controller.clearCache();
-          CookieManager().clearCookies();
+          // uncomment to make user type login/password each time creating new room
+          //controller.clearCache();
+          //CookieManager().clearCookies();
         });
   }
 }

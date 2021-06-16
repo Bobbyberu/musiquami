@@ -87,8 +87,7 @@ class SpotifyService {
       'response_type': 'code',
       'redirect_uri': 'http://url/',
       'scope':
-          'user-modify-playback-state user-read-private user-read-currently-playing user-read-recently-played',
-      'show_dialog': 'true'
+          'user-modify-playback-state user-read-private user-read-currently-playing user-read-recently-played'
     };
     return Uri.https('accounts.spotify.com', '/authorize', params).toString();
   }
